@@ -1,3 +1,26 @@
 {
-  "favorites": []
+  "favorites": [
+    {
+      "id": "_Ik0ig3yr9U",
+      "name": "charmeleon",
+      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/5.png",
+      "base_experience": 142,
+      "weight": 190
+    },
+    {
+      "id": "2mG4xuD8Mbs",
+      "name": "venusaur",
+      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/3.png",
+      "base_experience": 236,
+      "weight": 1000
+    },
+    {
+      "id": "HteRkTIU7eI",
+      "name": "charmander",
+      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png",
+      "base_experience": 62,
+      "weight": 85
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
 }

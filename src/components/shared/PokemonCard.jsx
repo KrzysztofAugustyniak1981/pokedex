@@ -19,7 +19,7 @@ const PokemonCard = ({ pokemon }) => {
       <h3>{pokemon.name}</h3>
 
       <img
-        src={pokemon.sprites.front_default}
+        src={pokemon.sprites?.front_default || pokemon.image}
         alt={pokemon.name}
       />
 

@@ -6,21 +6,31 @@ import {
   removeFavorite,
   getFavorites,
 } from "../../../services/favoriteService";
-import { getArena, addToArena } from "../../../services/ArenaService";
+import { getArena, addToArena } from "../../../services/arenaService";
 
 const PokemonDetails = () => {
   const { id } = useParams();
   const { pokemon, loading } = usePokemon(id);
 
   const [isFavorite, setIsFavorite] = useState(false);
+  const [favoriteRecordId, setFavoriteRecordId] = useState(null);
   const [arenaCount, setArenaCount] = useState(0);
 
   useEffect(() => {
     const checkFavorite = async () => {
       try {
         const favs = await getFavorites();
-        const exists = favs.find((fav) => fav.id === Number(id));
-        setIsFavorite(!!exists);
+        const existingFavorite = favs.find(
+          (fav) => fav.pokemonId === Number(id)
+        );
+
+        if (existingFavorite) {
+          setIsFavorite(true);
+          setFavoriteRecordId(existingFavorite.id);
+        } else {
+          setIsFavorite(false);
+          setFavoriteRecordId(null);
+        }
       } catch (error) {
         console.error("Błąd sprawdzania ulubionych:", error);
       }
@@ -34,18 +44,19 @@ const PokemonDetails = () => {
   useEffect(() => {
     const arena = getArena();
     setArenaCount(arena.length);
-  }, []);
+  }, [id]);
 
   const handleFavorite = async () => {
     if (!pokemon) return;
 
     try {
-      if (isFavorite) {
-        await removeFavorite(Number(id));
+      if (isFavorite && favoriteRecordId) {
+        await removeFavorite(favoriteRecordId);
         setIsFavorite(false);
+        setFavoriteRecordId(null);
       } else {
-        await addFavorite({
-          id: Number(id),
+        const newFavorite = await addFavorite({
+          pokemonId: Number(id),
           name: pokemon.name,
           image:
             pokemon.sprites?.other?.["official-artwork"]?.front_default ||
@@ -53,7 +64,9 @@ const PokemonDetails = () => {
           base_experience: pokemon.base_experience,
           weight: pokemon.weight,
         });
+
         setIsFavorite(true);
+        setFavoriteRecordId(newFavorite.id);
       }
     } catch (error) {
       console.error("Błąd zapisu ulubionych:", error);

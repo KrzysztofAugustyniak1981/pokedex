@@ -5,6 +5,7 @@ import Register from '../components/subpages/auth/Register';
 import PokemonDetails from "../components/subpages/pokemon/PokemonDetails";
 import Favourites from "../components/subpages/favourites/Favourites";
 import Arena from "../components/subpages/arena/Arena";
+import Ranking from "../components/subpages/ranking/Ranking";
 
 const AppRouter = () => {
     return (
@@ -15,6 +16,7 @@ const AppRouter = () => {
             <Route path="/pokemon/:id" element={<PokemonDetails />} />
             <Route path="/favorites" element={<Favourites />} />
             <Route path="/arena" element={<Arena />} />
+            <Route path="/ranking" element={<Ranking />} />
         </Routes>
     );
 };

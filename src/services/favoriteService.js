@@ -12,6 +12,6 @@ export const addFavorite = async (pokemon) => {
     return res.data;
 };
 
-export const removeFavorite = async (id) => {
-    await axios.delete(`${API_URL}/${id}`);
+export const removeFavorite = async (favoriteId) => {
+    await axios.delete(`${API_URL}/${favoriteId}`);
 };

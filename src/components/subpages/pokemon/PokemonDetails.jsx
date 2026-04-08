@@ -7,14 +7,45 @@ import {
   getFavorites,
 } from "../../../services/favoriteService";
 import { getArena, addToArena } from "../../../services/arenaService";
+import { getCustomPokemons } from "../../../services/customPokemonService";
 
 const PokemonDetails = () => {
   const { id } = useParams();
   const { pokemon, loading } = usePokemon(id);
 
+  const [displayPokemon, setDisplayPokemon] = useState(null);
   const [isFavorite, setIsFavorite] = useState(false);
   const [favoriteRecordId, setFavoriteRecordId] = useState(null);
   const [arenaCount, setArenaCount] = useState(0);
+
+  useEffect(() => {
+    const loadMergedPokemon = async () => {
+      if (!pokemon) return;
+
+      try {
+        const customPokemons = await getCustomPokemons();
+        const edited = customPokemons.find(
+          (custom) => custom.pokemonId === Number(id)
+        );
+
+        if (edited) {
+          setDisplayPokemon({
+            ...pokemon,
+            weight: edited.weight,
+            height: edited.height,
+            base_experience: edited.base_experience,
+          });
+        } else {
+          setDisplayPokemon(pokemon);
+        }
+      } catch (error) {
+        console.error("Błąd ładowania customPokemons:", error);
+        setDisplayPokemon(pokemon);
+      }
+    };
+
+    loadMergedPokemon();
+  }, [pokemon, id]);
 
   useEffect(() => {
     const checkFavorite = async () => {
@@ -47,7 +78,7 @@ const PokemonDetails = () => {
   }, [id]);
 
   const handleFavorite = async () => {
-    if (!pokemon) return;
+    if (!displayPokemon) return;
 
     try {
       if (isFavorite && favoriteRecordId) {
@@ -57,12 +88,13 @@ const PokemonDetails = () => {
       } else {
         const newFavorite = await addFavorite({
           pokemonId: Number(id),
-          name: pokemon.name,
+          name: displayPokemon.name,
           image:
-            pokemon.sprites?.other?.["official-artwork"]?.front_default ||
-            pokemon.sprites?.front_default,
-          base_experience: pokemon.base_experience,
-          weight: pokemon.weight,
+            displayPokemon.sprites?.other?.["official-artwork"]?.front_default ||
+            displayPokemon.sprites?.front_default ||
+            displayPokemon.image,
+          base_experience: displayPokemon.base_experience,
+          weight: displayPokemon.weight,
         });
 
         setIsFavorite(true);
@@ -74,34 +106,36 @@ const PokemonDetails = () => {
   };
 
   const handleAddToArena = () => {
-    if (!pokemon) return;
+    if (!displayPokemon) return;
 
     const updated = addToArena({
-      id: pokemon.id,
-      name: pokemon.name,
+      id: displayPokemon.id,
+      name: displayPokemon.name,
       image:
-        pokemon.sprites?.other?.["official-artwork"]?.front_default ||
-        pokemon.sprites?.front_default,
-      base_experience: pokemon.base_experience,
-      weight: pokemon.weight,
+        displayPokemon.sprites?.other?.["official-artwork"]?.front_default ||
+        displayPokemon.sprites?.front_default ||
+        displayPokemon.image,
+      base_experience: displayPokemon.base_experience,
+      weight: displayPokemon.weight,
     });
 
     setArenaCount(updated.length);
   };
 
   if (loading) return <p>Ładowanie...</p>;
-  if (!pokemon) return <p>Brak danych</p>;
+  if (!displayPokemon) return <p>Brak danych</p>;
 
   return (
     <div style={{ padding: "20px" }}>
-      <h1>{pokemon.name.toUpperCase()}</h1>
+      <h1>{displayPokemon.name.toUpperCase()}</h1>
 
       <img
         src={
-          pokemon.sprites?.other?.["official-artwork"]?.front_default ||
-          pokemon.sprites?.front_default
+          displayPokemon.sprites?.other?.["official-artwork"]?.front_default ||
+          displayPokemon.sprites?.front_default ||
+          displayPokemon.image
         }
-        alt={pokemon.name}
+        alt={displayPokemon.name}
         style={{ width: "200px" }}
       />
 
@@ -131,13 +165,13 @@ const PokemonDetails = () => {
         </button>
       </div>
 
-      <p>XP: {pokemon.base_experience}</p>
-      <p>Waga: {pokemon.weight}</p>
-      <p>Wzrost: {pokemon.height}</p>
+      <p>XP: {displayPokemon.base_experience}</p>
+      <p>Waga: {displayPokemon.weight}</p>
+      <p>Wzrost: {displayPokemon.height}</p>
 
       <h3>Typy:</h3>
       <ul>
-        {pokemon.types.map((type) => (
+        {displayPokemon.types?.map((type) => (
           <li key={type.type.name}>{type.type.name}</li>
         ))}
       </ul>

@@ -6,99 +6,63 @@ import { getCustomPokemons } from "../../../services/customPokemonService";
 const Edit = () => {
   const navigate = useNavigate();
   const { pokemons, loading, error } = usePokemons();
-  const [mergedPokemons, setMergedPokemons] = useState([]);
+  const [displayPokemons, setDisplayPokemons] = useState([]);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const loadMergedPokemons = async () => {
       try {
         const customPokemons = await getCustomPokemons();
 
-        const mappedApiPokemons = pokemons.map((pokemon) => {
-          const customVersion = customPokemons.find(
+        const merged = pokemons.map((pokemon) => {
+          const edited = customPokemons.find(
             (custom) => custom.pokemonId === pokemon.id
           );
 
-          if (customVersion) {
+          if (edited) {
             return {
               ...pokemon,
-              base_experience: customVersion.base_experience,
-              weight: customVersion.weight,
-              height: customVersion.height,
-              customRecordId: customVersion.id,
+              weight: edited.weight,
+              height: edited.height,
+              base_experience: edited.base_experience,
             };
           }
 
           return pokemon;
         });
 
-        const onlyNewCustomPokemons = customPokemons.filter(
-          (custom) => !custom.pokemonId
-        );
-
-        setMergedPokemons([...mappedApiPokemons, ...onlyNewCustomPokemons]);
+        setDisplayPokemons(merged);
       } catch (err) {
-        console.error("Błąd pobierania custom Pokémonów:", err);
+        console.error("Błąd ładowania edytowanych Pokémonów:", err);
       }
     };
 
-    if (pokemons.length) {
-      fetchData();
+    if (pokemons.length > 0) {
+      loadMergedPokemons();
     }
   }, [pokemons]);
 
-  if (loading) return <p>Ładowanie...</p>;
+  if (loading) return <p>Ładowanie edycji...</p>;
   if (error) return <p>{error}</p>;
 
   return (
     <div style={{ padding: "20px" }}>
       <h1>Edycja Pokémonów</h1>
 
-      <button
-        onClick={() => navigate("/edit/create")}
-        style={{
-          marginBottom: "20px",
-          padding: "10px 16px",
-          cursor: "pointer",
-        }}
-      >
+      <button onClick={() => navigate("/edit/create")}>
         Stwórz Pokemona
       </button>
 
-      <div>
-        {mergedPokemons.map((pokemon, index) => (
-          <div
-            key={pokemon.pokemonId || pokemon.id}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "16px",
-              padding: "12px",
-              borderBottom: "1px solid #ddd",
-            }}
-          >
-            <div style={{ width: "40px", fontWeight: "bold" }}>
-              {index + 1}.
-            </div>
-
-            <img
-              src={
-                pokemon.sprites?.front_default ||
-                pokemon.sprites?.other?.["official-artwork"]?.front_default ||
-                pokemon.image
-              }
-              alt={pokemon.name}
-              style={{ width: "60px", height: "60px", objectFit: "contain" }}
-            />
-
-            <div style={{ flex: 1 }}>
-              <h3 style={{ margin: 0 }}>{pokemon.name}</h3>
-            </div>
+      <div style={{ marginTop: "20px" }}>
+        {displayPokemons.map((pokemon, index) => (
+          <div key={pokemon.id} style={{ marginBottom: "10px" }}>
+            <span>
+              {index + 1}. {pokemon.name} | XP: {pokemon.base_experience} | Waga:{" "}
+              {pokemon.weight} | Wzrost: {pokemon.height}
+            </span>
 
             <button
-              onClick={() =>
-                navigate(`/edit/${pokemon.pokemonId || pokemon.id}`)
-              }
-              style={{ padding: "8px 12px", cursor: "pointer" }}
+              onClick={() => navigate(`/edit/${pokemon.id}`)}
+              style={{ marginLeft: "10px" }}
             >
               Edytuj
             </button>

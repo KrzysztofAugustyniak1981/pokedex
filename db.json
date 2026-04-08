@@ -1,4 +1,22 @@
 {
   "favorites": [],
-  "customPokemon": []
+  "customPokemons": [
+    {
+      "pokemonId": 4,
+      "name": "charmander",
+      "weight": 88,
+      "height": 8,
+      "base_experience": 60,
+      "id": "v3LIog2TbC0"
+    },
+    {
+      "pokemonId": 1,
+      "name": "bulbasaur",
+      "weight": 71,
+      "height": 7,
+      "base_experience": 64,
+      "id": "qrSYV9I3Ctg"
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
 }

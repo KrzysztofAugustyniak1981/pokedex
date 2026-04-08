@@ -14,6 +14,7 @@ const Navbar = () => {
                 <Link to="/favorites">Ulubione</Link>
                 <Link to="/arena">Arena</Link>
                 <Link to="/ranking">Ranking</Link>
+                <Link to="/edit">Edytuj</Link>
             </div>
         </nav>
     );

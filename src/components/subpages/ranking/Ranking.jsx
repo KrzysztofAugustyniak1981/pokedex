@@ -1,12 +1,54 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import usePokemons from "../../../hooks/usePokemons";
+import { getCustomPokemons } from "../../../services/customPokemonService";
 
 const Ranking = () => {
   const { pokemons, loading, error } = usePokemons();
+  const [displayPokemons, setDisplayPokemons] = useState([]);
   const [sortBy, setSortBy] = useState("base_experience");
 
+  useEffect(() => {
+    const loadMergedPokemons = async () => {
+      try {
+        const customPokemons = await getCustomPokemons();
+
+        const merged = pokemons.map((pokemon) => {
+          const edited = customPokemons.find(
+            (custom) => custom.pokemonId === pokemon.id
+          );
+
+          if (edited) {
+            return {
+              ...pokemon,
+              weight: edited.weight,
+              height: edited.height,
+              base_experience: edited.base_experience,
+              win: edited.win ?? pokemon.win,
+              lose: edited.lose ?? pokemon.lose,
+            };
+          }
+
+          return pokemon;
+        });
+
+        const onlyCreatedPokemons = customPokemons.filter(
+          (custom) => !custom.pokemonId
+        );
+
+        setDisplayPokemons([...merged, ...onlyCreatedPokemons]);
+      } catch (err) {
+        console.error("Błąd ładowania customPokemons:", err);
+        setDisplayPokemons(pokemons);
+      }
+    };
+
+    if (pokemons.length > 0) {
+      loadMergedPokemons();
+    }
+  }, [pokemons]);
+
   const sortedPokemons = useMemo(() => {
-    const copied = [...pokemons];
+    const copied = [...displayPokemons];
 
     return copied.sort((a, b) => {
       if (sortBy === "wins") {
@@ -15,7 +57,7 @@ const Ranking = () => {
 
       return (b[sortBy] || 0) - (a[sortBy] || 0);
     });
-  }, [pokemons, sortBy]);
+  }, [displayPokemons, sortBy]);
 
   if (loading) return <p>Ładowanie rankingu...</p>;
   if (error) return <p>{error}</p>;
@@ -42,7 +84,7 @@ const Ranking = () => {
       <div>
         {sortedPokemons.map((pokemon, index) => (
           <div
-            key={pokemon.id}
+            key={pokemon.pokemonId || pokemon.id}
             style={{
               display: "flex",
               alignItems: "center",

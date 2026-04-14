@@ -1,5 +1,23 @@
 {
-  "favorites": [],
+  "users": [],
+  "favorites": [
+    {
+      "pokemonId": 6,
+      "name": "charizard",
+      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png",
+      "base_experience": 240,
+      "weight": 905,
+      "id": "7ut9IbUYKhM"
+    },
+    {
+      "pokemonId": 15,
+      "name": "beedrill",
+      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/15.png",
+      "base_experience": 178,
+      "weight": 295,
+      "id": "aeBG5uNBm8g"
+    }
+  ],
   "customPokemons": [
     {
       "pokemonId": 4,
@@ -10,12 +28,34 @@
       "id": "v3LIog2TbC0"
     },
     {
-      "pokemonId": 1,
+      "id": "qrSYV9I3Ctg",
       "name": "bulbasaur",
-      "weight": 71,
+      "weight": 69,
       "height": 7,
       "base_experience": 64,
-      "id": "qrSYV9I3Ctg"
+      "pokemonId": 1
+    },
+    {
+      "name": "charizard",
+      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png",
+      "weight": 905,
+      "height": 17,
+      "base_experience": 250,
+      "win": 1,
+      "lose": 0,
+      "pokemonId": 6,
+      "id": "SwpNyJYvplI"
+    },
+    {
+      "name": "butterfree",
+      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/12.png",
+      "weight": 320,
+      "height": 11,
+      "base_experience": 178,
+      "win": 0,
+      "lose": 1,
+      "pokemonId": 12,
+      "id": "z_-Wez9QaDw"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

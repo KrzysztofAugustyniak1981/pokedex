@@ -34,13 +34,23 @@ const PokemonDetails = () => {
             weight: edited.weight,
             height: edited.height,
             base_experience: edited.base_experience,
+            win: edited.win ?? 0,
+            lose: edited.lose ?? 0,
           });
         } else {
-          setDisplayPokemon(pokemon);
+          setDisplayPokemon({
+            ...pokemon,
+            win: pokemon.win ?? 0,
+            lose: pokemon.lose ?? 0,
+          });
         }
       } catch (error) {
         console.error("Błąd ładowania customPokemons:", error);
-        setDisplayPokemon(pokemon);
+        setDisplayPokemon({
+          ...pokemon,
+          win: pokemon.win ?? 0,
+          lose: pokemon.lose ?? 0,
+        });
       }
     };
 
@@ -117,6 +127,9 @@ const PokemonDetails = () => {
         displayPokemon.image,
       base_experience: displayPokemon.base_experience,
       weight: displayPokemon.weight,
+      height: displayPokemon.height,
+      win: displayPokemon.win,
+      lose: displayPokemon.lose,
     });
 
     setArenaCount(updated.length);
@@ -168,6 +181,8 @@ const PokemonDetails = () => {
       <p>XP: {displayPokemon.base_experience}</p>
       <p>Waga: {displayPokemon.weight}</p>
       <p>Wzrost: {displayPokemon.height}</p>
+      <p>Wygrane: {displayPokemon.win || 0}</p>
+      <p>Przegrane: {displayPokemon.lose || 0}</p>
 
       <h3>Typy:</h3>
       <ul>
@@ -178,5 +193,6 @@ const PokemonDetails = () => {
     </div>
   );
 };
+
 
 export default PokemonDetails;

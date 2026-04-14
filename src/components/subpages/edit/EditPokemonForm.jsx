@@ -10,7 +10,10 @@ import {
 const EditPokemonForm = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { pokemons } = usePokemons();
+    const { pokemons, loading } = usePokemons();
+
+    const [pokemonName, setPokemonName] = useState("");
+    const [recordId, setRecordId] = useState(null);
 
     const [formData, setFormData] = useState({
         weight: "",
@@ -18,55 +21,56 @@ const EditPokemonForm = () => {
         base_experience: "",
     });
 
-    const [pokemonName, setPokemonName] = useState("");
-    const [customRecordId, setCustomRecordId] = useState(null);
-
     useEffect(() => {
         const loadData = async () => {
-            const apiPokemon = pokemons.find((p) => p.id === Number(id));
-            const customPokemons = await getCustomPokemons();
-            const customVersion = customPokemons.find(
-                (custom) => custom.pokemonId === Number(id)
-            );
+            try {
+                const customPokemons = await getCustomPokemons();
 
-            if (apiPokemon) {
-                setPokemonName(apiPokemon.name);
-                setFormData({
-                    weight: customVersion?.weight || apiPokemon.weight,
-                    height: customVersion?.height || apiPokemon.height,
-                    base_experience:
-                        customVersion?.base_experience || apiPokemon.base_experience,
-                });
-            } else {
+                const apiPokemon = pokemons.find((p) => p.id === Number(id));
+                const customForApi = customPokemons.find(
+                    (p) => p.pokemonId === Number(id)
+                );
                 const createdPokemon = customPokemons.find(
-                    (custom) => custom.id === Number(id) && !custom.pokemonId
+                    (p) => p.id === id && !p.pokemonId
                 );
 
-                if (createdPokemon) {
+                if (apiPokemon) {
+                    setPokemonName(apiPokemon.name);
+                    setRecordId(customForApi?.id || null);
+
+                    setFormData({
+                        weight: customForApi?.weight ?? apiPokemon.weight,
+                        height: customForApi?.height ?? apiPokemon.height,
+                        base_experience:
+                            customForApi?.base_experience ??
+                            apiPokemon.base_experience,
+                    });
+                } else if (createdPokemon) {
                     setPokemonName(createdPokemon.name);
-                    setCustomRecordId(createdPokemon.id);
+                    setRecordId(createdPokemon.id);
+
                     setFormData({
                         weight: createdPokemon.weight,
                         height: createdPokemon.height,
                         base_experience: createdPokemon.base_experience,
                     });
                 }
-            }
-
-            if (customVersion) {
-                setCustomRecordId(customVersion.id);
+            } catch (err) {
+                console.error("Błąd ładowania danych:", err);
             }
         };
 
-        if (pokemons.length) {
+        if (pokemons.length > 0) {
             loadData();
         }
     }, [id, pokemons]);
 
     const handleChange = (e) => {
+        const { name, value } = e.target;
+
         setFormData((prev) => ({
             ...prev,
-            [e.target.name]: e.target.value,
+            [name]: value,
         }));
     };
 
@@ -74,31 +78,33 @@ const EditPokemonForm = () => {
         e.preventDefault();
 
         try {
-            if (customRecordId) {
-                const customPokemons = await getCustomPokemons();
-                const oldRecord = customPokemons.find((p) => p.id === customRecordId);
+            const payload = {
+                name: pokemonName,
+                weight: Number(formData.weight),
+                height: Number(formData.height),
+                base_experience: Number(formData.base_experience),
+            };
 
-                await updateCustomPokemon(customRecordId, {
-                    ...oldRecord,
-                    weight: Number(formData.weight),
-                    height: Number(formData.height),
-                    base_experience: Number(formData.base_experience),
+            if (recordId) {
+                await updateCustomPokemon(recordId, {
+                    id: recordId,
+                    ...payload,
+                    pokemonId: Number(id) || undefined,
                 });
             } else {
                 await addCustomPokemon({
+                    ...payload,
                     pokemonId: Number(id),
-                    name: pokemonName,
-                    weight: Number(formData.weight),
-                    height: Number(formData.height),
-                    base_experience: Number(formData.base_experience),
                 });
             }
 
-            navigate("/");
-        } catch (error) {
-            console.error("Błąd edycji Pokémona:", error);
+            navigate("/edit");
+        } catch (err) {
+            console.error("Błąd zapisu:", err);
         }
     };
+
+    if (loading) return <p>Ładowanie formularza...</p>;
 
     return (
         <div style={{ padding: "20px" }}>
@@ -106,7 +112,12 @@ const EditPokemonForm = () => {
 
             <form
                 onSubmit={handleSubmit}
-                style={{ display: "flex", flexDirection: "column", gap: "12px", maxWidth: "400px" }}
+                style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "12px",
+                    maxWidth: "400px",
+                }}
             >
                 <input
                     type="number"

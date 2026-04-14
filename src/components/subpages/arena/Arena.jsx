@@ -4,6 +4,11 @@ import {
   removeFromArena,
   clearArena,
 } from "../../../services/arenaService";
+import {
+  getCustomPokemons,
+  addCustomPokemon,
+  updateCustomPokemon,
+} from "../../../services/customPokemonService";
 
 const Arena = () => {
   const [arenaPokemons, setArenaPokemons] = useState([]);
@@ -11,13 +16,11 @@ const Arena = () => {
   const [loserId, setLoserId] = useState(null);
   const [isDraw, setIsDraw] = useState(false);
 
-  // 🔄 pobranie Pokémonów z localStorage
   useEffect(() => {
     const data = getArena();
     setArenaPokemons(data);
   }, []);
 
-  // ❌ usuwanie z areny
   const handleRemove = (id) => {
     const updated = removeFromArena(id);
     setArenaPokemons(updated);
@@ -26,8 +29,40 @@ const Arena = () => {
     setIsDraw(false);
   };
 
-  // ⚔️ WALKA
-  const handleFight = () => {
+  const savePokemonStats = async (pokemon) => {
+    try {
+      const customPokemons = await getCustomPokemons();
+
+      const existingPokemon = customPokemons.find(
+        (item) => item.pokemonId === pokemon.id
+      );
+
+      const pokemonData = {
+        name: pokemon.name,
+        image: pokemon.image,
+        weight: pokemon.weight,
+        height: pokemon.height || 0,
+        base_experience: pokemon.base_experience,
+        win: pokemon.win || 0,
+        lose: pokemon.lose || 0,
+        pokemonId: pokemon.id,
+      };
+
+      if (existingPokemon) {
+        await updateCustomPokemon(existingPokemon.id, {
+          ...existingPokemon,
+          ...pokemonData,
+          id: existingPokemon.id,
+        });
+      } else {
+        await addCustomPokemon(pokemonData);
+      }
+    } catch (error) {
+      console.error("Błąd zapisu statystyk pokemona:", error);
+    }
+  };
+
+  const handleFight = async () => {
     if (arenaPokemons.length < 2) return;
 
     const [pokemon1, pokemon2] = arenaPokemons;
@@ -40,12 +75,17 @@ const Arena = () => {
         ...pokemon1,
         base_experience: pokemon1.base_experience + 10,
         win: (pokemon1.win || 0) + 1,
+        lose: pokemon1.lose || 0,
       };
 
       const updatedLoser = {
         ...pokemon2,
+        win: pokemon2.win || 0,
         lose: (pokemon2.lose || 0) + 1,
       };
+
+      await savePokemonStats(updatedWinner);
+      await savePokemonStats(updatedLoser);
 
       setWinner(updatedWinner);
       setLoserId(pokemon2.id);
@@ -55,12 +95,17 @@ const Arena = () => {
         ...pokemon2,
         base_experience: pokemon2.base_experience + 10,
         win: (pokemon2.win || 0) + 1,
+        lose: pokemon2.lose || 0,
       };
 
       const updatedLoser = {
         ...pokemon1,
+        win: pokemon1.win || 0,
         lose: (pokemon1.lose || 0) + 1,
       };
+
+      await savePokemonStats(updatedWinner);
+      await savePokemonStats(updatedLoser);
 
       setWinner(updatedWinner);
       setLoserId(pokemon1.id);
@@ -72,7 +117,6 @@ const Arena = () => {
     }
   };
 
-  // 🚪 reset areny
   const handleLeaveArena = () => {
     clearArena();
     setArenaPokemons([]);
@@ -85,7 +129,6 @@ const Arena = () => {
     <div style={{ padding: "20px" }}>
       <h1>Arena</h1>
 
-      {/* 🧱 SLOTY */}
       <div
         style={{
           display: "flex",
@@ -108,17 +151,13 @@ const Arena = () => {
                 borderRadius: "12px",
                 padding: "16px",
                 textAlign: "center",
-                opacity:
-                  pokemon && loserId === pokemon.id ? 0.4 : 1,
+                opacity: pokemon && loserId === pokemon.id ? 0.4 : 1,
                 background:
-                  pokemon && winner?.id === pokemon.id
-                    ? "#d4edda"
-                    : "#fff",
+                  pokemon && winner?.id === pokemon.id ? "#d4edda" : "#fff",
               }}
             >
               {pokemon ? (
                 <>
-                  {/* ❌ usuń */}
                   <button
                     onClick={() => handleRemove(pokemon.id)}
                     style={{
@@ -143,7 +182,7 @@ const Arena = () => {
 
                   <p>XP: {pokemon.base_experience}</p>
                   <p>Waga: {pokemon.weight}</p>
-
+                  <p>Wzrost: {pokemon.height}</p>
                   <p>Win: {pokemon.win || 0}</p>
                   <p>Lose: {pokemon.lose || 0}</p>
                 </>
@@ -158,7 +197,6 @@ const Arena = () => {
         })}
       </div>
 
-      {/* ⚔️ WALCZ */}
       <div style={{ marginTop: "30px", textAlign: "center" }}>
         <button
           onClick={handleFight}
@@ -166,8 +204,7 @@ const Arena = () => {
           style={{
             padding: "12px 24px",
             fontSize: "18px",
-            cursor:
-              arenaPokemons.length < 2 ? "not-allowed" : "pointer",
+            cursor: arenaPokemons.length < 2 ? "not-allowed" : "pointer",
             opacity: arenaPokemons.length < 2 ? 0.5 : 1,
           }}
         >
@@ -175,18 +212,14 @@ const Arena = () => {
         </button>
       </div>
 
-      {/* 🏆 WYNIK */}
       <div style={{ marginTop: "20px", textAlign: "center" }}>
         {winner && <h2>🏆 Wygrywa: {winner.name}</h2>}
         {isDraw && <h2>🤝 REMIS!</h2>}
       </div>
 
-      {/* 🚪 RESET */}
       {(winner || isDraw) && (
         <div style={{ marginTop: "20px", textAlign: "center" }}>
-          <button onClick={handleLeaveArena}>
-            Opuść arenę
-          </button>
+          <button onClick={handleLeaveArena}>Opuść arenę</button>
         </div>
       )}
     </div>

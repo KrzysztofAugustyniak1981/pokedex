@@ -1,5 +1,12 @@
 {
-  "users": [],
+  "users": [
+    {
+      "name": "Krzysztof",
+      "email": "test@test",
+      "password": "123",
+      "id": "pKYHVS1IA4c"
+    }
+  ],
   "favorites": [
     {
       "pokemonId": 6,
@@ -16,6 +23,22 @@
       "base_experience": 178,
       "weight": 295,
       "id": "aeBG5uNBm8g"
+    },
+    {
+      "pokemonId": 3,
+      "name": "venusaur",
+      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/3.png",
+      "base_experience": 236,
+      "weight": 1000,
+      "id": "0ojD4gIgmsU"
+    },
+    {
+      "pokemonId": 8,
+      "name": "wartortle",
+      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/8.png",
+      "base_experience": 142,
+      "weight": 225,
+      "id": "nHCNmI856gE"
     }
   ],
   "customPokemons": [
@@ -56,6 +79,28 @@
       "lose": 1,
       "pokemonId": 12,
       "id": "z_-Wez9QaDw"
+    },
+    {
+      "name": "venusaur",
+      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/3.png",
+      "weight": 1000,
+      "height": 20,
+      "base_experience": 246,
+      "win": 1,
+      "lose": 0,
+      "pokemonId": 3,
+      "id": "MIFrpnxkleA"
+    },
+    {
+      "name": "wartortle",
+      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/8.png",
+      "weight": 225,
+      "height": 10,
+      "base_experience": 142,
+      "win": 0,
+      "lose": 1,
+      "pokemonId": 8,
+      "id": "9sEthvl1TtY"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

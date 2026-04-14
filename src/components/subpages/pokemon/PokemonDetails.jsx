@@ -8,10 +8,12 @@ import {
 } from "../../../services/favoriteService";
 import { getArena, addToArena } from "../../../services/arenaService";
 import { getCustomPokemons } from "../../../services/customPokemonService";
+import { useAuth } from "../../../context/AuthContext";
 
 const PokemonDetails = () => {
   const { id } = useParams();
   const { pokemon, loading } = usePokemon(id);
+  const { user } = useAuth();
 
   const [displayPokemon, setDisplayPokemon] = useState(null);
   const [isFavorite, setIsFavorite] = useState(false);
@@ -77,18 +79,21 @@ const PokemonDetails = () => {
       }
     };
 
-    if (id) {
+    if (id && user) {
       checkFavorite();
+    } else {
+      setIsFavorite(false);
+      setFavoriteRecordId(null);
     }
-  }, [id]);
+  }, [id, user]);
 
   useEffect(() => {
     const arena = getArena();
     setArenaCount(arena.length);
-  }, [id]);
+  }, [id, user]);
 
   const handleFavorite = async () => {
-    if (!displayPokemon) return;
+    if (!displayPokemon || !user) return;
 
     try {
       if (isFavorite && favoriteRecordId) {
@@ -116,7 +121,7 @@ const PokemonDetails = () => {
   };
 
   const handleAddToArena = () => {
-    if (!displayPokemon) return;
+    if (!displayPokemon || !user) return;
 
     const updated = addToArena({
       id: displayPokemon.id,
@@ -152,31 +157,33 @@ const PokemonDetails = () => {
         style={{ width: "200px" }}
       />
 
-      <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}>
-        <button
-          onClick={handleFavorite}
-          style={{
-            padding: "10px",
-            fontSize: "16px",
-            cursor: "pointer",
-          }}
-        >
-          {isFavorite ? "❤️ Usuń z ulubionych" : "🤍 Dodaj do ulubionych"}
-        </button>
+      {user && (
+        <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}>
+          <button
+            onClick={handleFavorite}
+            style={{
+              padding: "10px",
+              fontSize: "16px",
+              cursor: "pointer",
+            }}
+          >
+            {isFavorite ? "❤️ Usuń z ulubionych" : "🤍 Dodaj do ulubionych"}
+          </button>
 
-        <button
-          onClick={handleAddToArena}
-          disabled={arenaCount >= 2}
-          style={{
-            padding: "10px",
-            fontSize: "16px",
-            cursor: arenaCount >= 2 ? "not-allowed" : "pointer",
-            opacity: arenaCount >= 2 ? 0.6 : 1,
-          }}
-        >
-          ⚔️ Dodaj do areny ({arenaCount}/2)
-        </button>
-      </div>
+          <button
+            onClick={handleAddToArena}
+            disabled={arenaCount >= 2}
+            style={{
+              padding: "10px",
+              fontSize: "16px",
+              cursor: arenaCount >= 2 ? "not-allowed" : "pointer",
+              opacity: arenaCount >= 2 ? 0.6 : 1,
+            }}
+          >
+            ⚔️ Dodaj do areny ({arenaCount}/2)
+          </button>
+        </div>
+      )}
 
       <p>XP: {displayPokemon.base_experience}</p>
       <p>Waga: {displayPokemon.weight}</p>
@@ -193,6 +200,5 @@ const PokemonDetails = () => {
     </div>
   );
 };
-
 
 export default PokemonDetails;

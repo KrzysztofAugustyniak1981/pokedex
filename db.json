@@ -2,106 +2,37 @@
   "users": [
     {
       "name": "Krzysztof",
-      "email": "test@test",
+      "email": "1@1",
       "password": "123",
       "id": "pKYHVS1IA4c"
+    },
+    {
+      "name": "Ala",
+      "email": "2@2",
+      "password": "321",
+      "id": "6k0-wU4fNl8"
     }
   ],
   "favorites": [
     {
-      "pokemonId": 6,
-      "name": "charizard",
-      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png",
-      "base_experience": 240,
-      "weight": 905,
-      "id": "7ut9IbUYKhM"
-    },
-    {
-      "pokemonId": 15,
-      "name": "beedrill",
-      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/15.png",
-      "base_experience": 178,
-      "weight": 295,
-      "id": "aeBG5uNBm8g"
-    },
-    {
-      "pokemonId": 3,
-      "name": "venusaur",
-      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/3.png",
-      "base_experience": 236,
-      "weight": 1000,
-      "id": "0ojD4gIgmsU"
-    },
-    {
-      "pokemonId": 8,
-      "name": "wartortle",
-      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/8.png",
-      "base_experience": 142,
-      "weight": 225,
-      "id": "nHCNmI856gE"
-    }
-  ],
-  "customPokemons": [
-    {
+      "userId": "pKYHVS1IA4c",
       "pokemonId": 4,
       "name": "charmander",
-      "weight": 88,
-      "height": 8,
-      "base_experience": 60,
-      "id": "v3LIog2TbC0"
+      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/4.png",
+      "base_experience": 62,
+      "weight": 85,
+      "id": "EBBJeyjchyQ"
     },
     {
-      "id": "qrSYV9I3Ctg",
-      "name": "bulbasaur",
-      "weight": 69,
-      "height": 7,
-      "base_experience": 64,
-      "pokemonId": 1
-    },
-    {
-      "name": "charizard",
-      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png",
-      "weight": 905,
-      "height": 17,
-      "base_experience": 250,
-      "win": 1,
-      "lose": 0,
-      "pokemonId": 6,
-      "id": "SwpNyJYvplI"
-    },
-    {
-      "name": "butterfree",
-      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/12.png",
-      "weight": 320,
-      "height": 11,
-      "base_experience": 178,
-      "win": 0,
-      "lose": 1,
-      "pokemonId": 12,
-      "id": "z_-Wez9QaDw"
-    },
-    {
-      "name": "venusaur",
-      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/3.png",
-      "weight": 1000,
-      "height": 20,
-      "base_experience": 246,
-      "win": 1,
-      "lose": 0,
-      "pokemonId": 3,
-      "id": "MIFrpnxkleA"
-    },
-    {
-      "name": "wartortle",
-      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/8.png",
-      "weight": 225,
-      "height": 10,
-      "base_experience": 142,
-      "win": 0,
-      "lose": 1,
-      "pokemonId": 8,
-      "id": "9sEthvl1TtY"
+      "userId": "6k0-wU4fNl8",
+      "pokemonId": 9,
+      "name": "blastoise",
+      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/9.png",
+      "base_experience": 239,
+      "weight": 855,
+      "id": "mBtwlnIYbjc"
     }
   ],
+  "customPokemons": [],
   "$schema": "./node_modules/json-server/schema.json"
 }

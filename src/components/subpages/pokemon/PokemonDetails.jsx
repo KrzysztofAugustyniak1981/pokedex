@@ -61,10 +61,15 @@ const PokemonDetails = () => {
 
   useEffect(() => {
     const checkFavorite = async () => {
+      if (!user) return;
+
       try {
         const favs = await getFavorites();
+
         const existingFavorite = favs.find(
-          (fav) => fav.pokemonId === Number(id)
+          (fav) =>
+            fav.pokemonId === Number(id) &&
+            String(fav.userId) === String(user.id)
         );
 
         if (existingFavorite) {
@@ -96,12 +101,15 @@ const PokemonDetails = () => {
     if (!displayPokemon || !user) return;
 
     try {
+      console.log("AKTUALNY USER:", user);
+
       if (isFavorite && favoriteRecordId) {
         await removeFavorite(favoriteRecordId);
         setIsFavorite(false);
         setFavoriteRecordId(null);
       } else {
-        const newFavorite = await addFavorite({
+        const payload = {
+          userId: user.id,
           pokemonId: Number(id),
           name: displayPokemon.name,
           image:
@@ -110,7 +118,11 @@ const PokemonDetails = () => {
             displayPokemon.image,
           base_experience: displayPokemon.base_experience,
           weight: displayPokemon.weight,
-        });
+        };
+
+        console.log("PAYLOAD DO FAVORITES:", payload);
+
+        const newFavorite = await addFavorite(payload);
 
         setIsFavorite(true);
         setFavoriteRecordId(newFavorite.id);

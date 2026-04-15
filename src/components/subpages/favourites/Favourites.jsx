@@ -1,41 +1,57 @@
 import { useEffect, useState } from "react";
 import { getFavorites } from "../../../services/favoriteService";
 import PokemonCard from "../../shared/PokemonCard";
+import { useAuth } from "../../../context/AuthContext";
 
 const Favourites = () => {
-    const [favorites, setFavorites] = useState([]);
+  const { user } = useAuth();
+  const [favorites, setFavorites] = useState([]);
 
-    useEffect(() => {
-        const fetchFavorites = async () => {
-            const data = await getFavorites();
-            console.log("FAVS:", data);
-            setFavorites(data);
-        };
+  useEffect(() => {
+    const fetchFavorites = async () => {
+      if (!user) {
+        setFavorites([]);
+        return;
+      }
 
-        fetchFavorites();
-    }, []);
+      try {
+        const data = await getFavorites();
 
-    if (favorites.length === 0) {
-        return <p>Brak ulubionych Pokemonów.</p>;
-    }
+        const userFavorites = data.filter(
+          (pokemon) => String(pokemon.userId) === String(user.id)
+        );
 
-    return (
-        <div style={{ padding: "20px" }}>
-            <h1>Ulubione</h1>
+        setFavorites(userFavorites);
+      } catch (error) {
+        console.error("Błąd pobierania ulubionych:", error);
+        setFavorites([]);
+      }
+    };
 
-            <div
-                style={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))",
-                    gap: "10px",
-                }}
-            >
-                {favorites.map((pokemon) => (
-                    <PokemonCard key={pokemon.id} pokemon={pokemon} />
-                ))}
-            </div>
-        </div>
-    );
+    fetchFavorites();
+  }, [user]);
+
+  if (favorites.length === 0) {
+    return <p>Brak ulubionych Pokemonów.</p>;
+  }
+
+  return (
+    <div style={{ padding: "20px" }}>
+      <h1>Ulubione</h1>
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))",
+          gap: "10px",
+        }}
+      >
+        {favorites.map((pokemon) => (
+          <PokemonCard key={pokemon.id} pokemon={pokemon} />
+        ))}
+      </div>
+    </div>
+  );
 };
 
 export default Favourites;

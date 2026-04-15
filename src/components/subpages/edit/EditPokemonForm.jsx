@@ -1,12 +1,29 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSnackbar } from "notistack";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import usePokemons from "../../../hooks/usePokemons";
 import {
   getCustomPokemons,
   addCustomPokemon,
   updateCustomPokemon,
 } from "../../../services/customPokemonService";
+
+const editPokemonSchema = z.object({
+  weight: z
+    .number({ invalid_type_error: "Podaj wagę" })
+    .positive("Waga musi być większa od 0"),
+
+  height: z
+    .number({ invalid_type_error: "Podaj wzrost" })
+    .positive("Wzrost musi być większy od 0"),
+
+  base_experience: z
+    .number({ invalid_type_error: "Podaj doświadczenie" })
+    .positive("Doświadczenie musi być większe od 0"),
+});
 
 const EditPokemonForm = () => {
   const { id } = useParams();
@@ -17,10 +34,18 @@ const EditPokemonForm = () => {
   const [pokemonName, setPokemonName] = useState("");
   const [recordId, setRecordId] = useState(null);
 
-  const [formData, setFormData] = useState({
-    weight: "",
-    height: "",
-    base_experience: "",
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(editPokemonSchema),
+    defaultValues: {
+      weight: "",
+      height: "",
+      base_experience: "",
+    },
   });
 
   useEffect(() => {
@@ -33,14 +58,14 @@ const EditPokemonForm = () => {
           (p) => p.pokemonId === Number(id)
         );
         const createdPokemon = customPokemons.find(
-          (p) => p.id === id && !p.pokemonId
+          (p) => String(p.id) === String(id) && !p.pokemonId
         );
 
         if (apiPokemon) {
           setPokemonName(apiPokemon.name);
           setRecordId(customForApi?.id || null);
 
-          setFormData({
+          reset({
             weight: customForApi?.weight ?? apiPokemon.weight,
             height: customForApi?.height ?? apiPokemon.height,
             base_experience:
@@ -50,7 +75,7 @@ const EditPokemonForm = () => {
           setPokemonName(createdPokemon.name);
           setRecordId(createdPokemon.id);
 
-          setFormData({
+          reset({
             weight: createdPokemon.weight,
             height: createdPokemon.height,
             base_experience: createdPokemon.base_experience,
@@ -67,26 +92,15 @@ const EditPokemonForm = () => {
     if (pokemons.length > 0) {
       loadData();
     }
-  }, [id, pokemons, enqueueSnackbar]);
+  }, [id, pokemons, reset, enqueueSnackbar]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
+  const onSubmit = async (data) => {
     try {
       const payload = {
         name: pokemonName,
-        weight: Number(formData.weight),
-        height: Number(formData.height),
-        base_experience: Number(formData.base_experience),
+        weight: data.weight,
+        height: data.height,
+        base_experience: data.base_experience,
       };
 
       if (recordId) {
@@ -123,7 +137,7 @@ const EditPokemonForm = () => {
       <h1>Edytuj Pokemona: {pokemonName}</h1>
 
       <form
-        onSubmit={handleSubmit}
+        onSubmit={handleSubmit(onSubmit)}
         style={{
           display: "flex",
           flexDirection: "column",
@@ -132,32 +146,47 @@ const EditPokemonForm = () => {
           margin: "0 auto",
         }}
       >
-        <input
-          type="number"
-          name="weight"
-          placeholder="Waga"
-          value={formData.weight}
-          onChange={handleChange}
-          required
-        />
+        <div style={{ textAlign: "left" }}>
+          <input
+            type="number"
+            placeholder="Waga"
+            {...register("weight", { valueAsNumber: true })}
+            style={{ width: "100%", padding: "10px", boxSizing: "border-box" }}
+          />
+          {errors.weight && (
+            <p style={{ color: "red", fontSize: "14px", marginTop: "4px" }}>
+              {errors.weight.message}
+            </p>
+          )}
+        </div>
 
-        <input
-          type="number"
-          name="height"
-          placeholder="Wzrost"
-          value={formData.height}
-          onChange={handleChange}
-          required
-        />
+        <div style={{ textAlign: "left" }}>
+          <input
+            type="number"
+            placeholder="Wzrost"
+            {...register("height", { valueAsNumber: true })}
+            style={{ width: "100%", padding: "10px", boxSizing: "border-box" }}
+          />
+          {errors.height && (
+            <p style={{ color: "red", fontSize: "14px", marginTop: "4px" }}>
+              {errors.height.message}
+            </p>
+          )}
+        </div>
 
-        <input
-          type="number"
-          name="base_experience"
-          placeholder="Doświadczenie"
-          value={formData.base_experience}
-          onChange={handleChange}
-          required
-        />
+        <div style={{ textAlign: "left" }}>
+          <input
+            type="number"
+            placeholder="Doświadczenie"
+            {...register("base_experience", { valueAsNumber: true })}
+            style={{ width: "100%", padding: "10px", boxSizing: "border-box" }}
+          />
+          {errors.base_experience && (
+            <p style={{ color: "red", fontSize: "14px", marginTop: "4px" }}>
+              {errors.base_experience.message}
+            </p>
+          )}
+        </div>
 
         <button type="submit">Zmień atrybuty</button>
       </form>

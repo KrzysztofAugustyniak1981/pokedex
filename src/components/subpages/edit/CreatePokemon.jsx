@@ -1,44 +1,64 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { addCustomPokemon } from "../../../services/customPokemonService";
+
+const createPokemonSchema = z.object({
+  name: z
+    .string()
+    .min(2, "Nazwa musi mieć co najmniej 2 znaki"),
+
+  weight: z
+    .number({ invalid_type_error: "Podaj wagę" })
+    .positive("Waga musi być większa od 0"),
+
+  height: z
+    .number({ invalid_type_error: "Podaj wzrost" })
+    .positive("Wzrost musi być większy od 0"),
+
+  base_experience: z
+    .number({ invalid_type_error: "Podaj doświadczenie" })
+    .positive("Doświadczenie musi być większe od 0"),
+
+  image: z
+    .string()
+    .url("Podaj poprawny URL grafiki"),
+});
 
 const CreatePokemon = () => {
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
 
-  const [formData, setFormData] = useState({
-    name: "",
-    weight: "",
-    height: "",
-    base_experience: "",
-    image: "",
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(createPokemonSchema),
+    defaultValues: {
+      name: "",
+      weight: "",
+      height: "",
+      base_experience: "",
+      image: "",
+    },
   });
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
+  const onSubmit = async (data) => {
     try {
       await addCustomPokemon({
-        name: formData.name,
-        weight: Number(formData.weight),
-        height: Number(formData.height),
-        base_experience: Number(formData.base_experience),
-        image: formData.image,
+        name: data.name,
+        weight: data.weight,
+        height: data.height,
+        base_experience: data.base_experience,
+        image: data.image,
         win: 0,
         lose: 0,
       });
 
-      enqueueSnackbar(`Nowy pokemon ${formData.name} został dodany`, {
+      enqueueSnackbar(`Nowy pokemon ${data.name} został dodany`, {
         variant: "success",
       });
 
@@ -57,7 +77,7 @@ const CreatePokemon = () => {
       <h1>Stwórz Pokemona</h1>
 
       <form
-        onSubmit={handleSubmit}
+        onSubmit={handleSubmit(onSubmit)}
         style={{
           display: "flex",
           flexDirection: "column",
@@ -66,50 +86,70 @@ const CreatePokemon = () => {
           margin: "0 auto",
         }}
       >
-        <input
-          type="text"
-          name="name"
-          placeholder="Nazwa"
-          value={formData.name}
-          onChange={handleChange}
-          required
-        />
+        {/* NAME */}
+        <div style={{ textAlign: "left" }}>
+          <input
+            type="text"
+            placeholder="Nazwa"
+            {...register("name")}
+            style={{ width: "100%", padding: "10px" }}
+          />
+          {errors.name && <p style={{ color: "red" }}>{errors.name.message}</p>}
+        </div>
 
-        <input
-          type="number"
-          name="weight"
-          placeholder="Waga"
-          value={formData.weight}
-          onChange={handleChange}
-          required
-        />
+        {/* WEIGHT */}
+        <div style={{ textAlign: "left" }}>
+          <input
+            type="number"
+            placeholder="Waga"
+            {...register("weight", { valueAsNumber: true })}
+            style={{ width: "100%", padding: "10px" }}
+          />
+          {errors.weight && (
+            <p style={{ color: "red" }}>{errors.weight.message}</p>
+          )}
+        </div>
 
-        <input
-          type="number"
-          name="height"
-          placeholder="Wzrost"
-          value={formData.height}
-          onChange={handleChange}
-          required
-        />
+        {/* HEIGHT */}
+        <div style={{ textAlign: "left" }}>
+          <input
+            type="number"
+            placeholder="Wzrost"
+            {...register("height", { valueAsNumber: true })}
+            style={{ width: "100%", padding: "10px" }}
+          />
+          {errors.height && (
+            <p style={{ color: "red" }}>{errors.height.message}</p>
+          )}
+        </div>
 
-        <input
-          type="number"
-          name="base_experience"
-          placeholder="Doświadczenie"
-          value={formData.base_experience}
-          onChange={handleChange}
-          required
-        />
+        {/* XP */}
+        <div style={{ textAlign: "left" }}>
+          <input
+            type="number"
+            placeholder="Doświadczenie"
+            {...register("base_experience", { valueAsNumber: true })}
+            style={{ width: "100%", padding: "10px" }}
+          />
+          {errors.base_experience && (
+            <p style={{ color: "red" }}>
+              {errors.base_experience.message}
+            </p>
+          )}
+        </div>
 
-        <input
-          type="text"
-          name="image"
-          placeholder="URL grafiki"
-          value={formData.image}
-          onChange={handleChange}
-          required
-        />
+        {/* IMAGE */}
+        <div style={{ textAlign: "left" }}>
+          <input
+            type="text"
+            placeholder="URL grafiki"
+            {...register("image")}
+            style={{ width: "100%", padding: "10px" }}
+          />
+          {errors.image && (
+            <p style={{ color: "red" }}>{errors.image.message}</p>
+          )}
+        </div>
 
         <button type="submit">Stwórz</button>
       </form>

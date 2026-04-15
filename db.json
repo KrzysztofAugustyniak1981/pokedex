@@ -33,6 +33,14 @@
       "id": "mBtwlnIYbjc"
     }
   ],
-  "customPokemons": [],
+  "customPokemons": [
+    {
+      "id": "MnsLDJEmnBQ",
+      "name": "123",
+      "weight": 123,
+      "height": 14,
+      "base_experience": 6
+    }
+  ],
   "$schema": "./node_modules/json-server/schema.json"
 }

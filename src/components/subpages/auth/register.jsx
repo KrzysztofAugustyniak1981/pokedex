@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSnackbar } from "notistack";
 import { registerUser, getUserByEmail } from "../../../services/authService";
 
 const Register = () => {
   const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -25,32 +27,39 @@ const Register = () => {
     e.preventDefault();
 
     try {
-      // sprawdzamy czy user już istnieje
       const existingUser = await getUserByEmail(formData.email);
 
       if (existingUser) {
-        alert("Użytkownik o tym emailu już istnieje");
+        enqueueSnackbar("Użytkownik o tym emailu już istnieje", {
+          variant: "error",
+        });
         return;
       }
 
-      // sprawdzamy hasła
       if (formData.password !== formData.repeatPassword) {
-        alert("Hasła się nie zgadzają");
+        enqueueSnackbar("Hasła się nie zgadzają", {
+          variant: "error",
+        });
         return;
       }
 
-      // zapis do bazy
       await registerUser({
         name: formData.name,
         email: formData.email,
         password: formData.password,
       });
 
-      alert("Rejestracja udana!");
+      enqueueSnackbar("Rejestracja udana!", {
+        variant: "success",
+      });
 
       navigate("/login");
     } catch (error) {
       console.error("Błąd rejestracji:", error);
+
+      enqueueSnackbar("Wystąpił błąd podczas rejestracji", {
+        variant: "error",
+      });
     }
   };
 

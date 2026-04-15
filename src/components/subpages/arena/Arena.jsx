@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useSnackbar } from "notistack";
 import {
   getArena,
   removeFromArena,
@@ -11,6 +12,8 @@ import {
 } from "../../../services/customPokemonService";
 
 const Arena = () => {
+  const { enqueueSnackbar } = useSnackbar();
+
   const [arenaPokemons, setArenaPokemons] = useState([]);
   const [winner, setWinner] = useState(null);
   const [loserId, setLoserId] = useState(null);
@@ -30,35 +33,31 @@ const Arena = () => {
   };
 
   const savePokemonStats = async (pokemon) => {
-    try {
-      const customPokemons = await getCustomPokemons();
+    const customPokemons = await getCustomPokemons();
 
-      const existingPokemon = customPokemons.find(
-        (item) => item.pokemonId === pokemon.id
-      );
+    const existingPokemon = customPokemons.find(
+      (item) => item.pokemonId === pokemon.id
+    );
 
-      const pokemonData = {
-        name: pokemon.name,
-        image: pokemon.image,
-        weight: pokemon.weight,
-        height: pokemon.height || 0,
-        base_experience: pokemon.base_experience,
-        win: pokemon.win || 0,
-        lose: pokemon.lose || 0,
-        pokemonId: pokemon.id,
-      };
+    const pokemonData = {
+      name: pokemon.name,
+      image: pokemon.image,
+      weight: pokemon.weight,
+      height: pokemon.height || 0,
+      base_experience: pokemon.base_experience,
+      win: pokemon.win || 0,
+      lose: pokemon.lose || 0,
+      pokemonId: pokemon.id,
+    };
 
-      if (existingPokemon) {
-        await updateCustomPokemon(existingPokemon.id, {
-          ...existingPokemon,
-          ...pokemonData,
-          id: existingPokemon.id,
-        });
-      } else {
-        await addCustomPokemon(pokemonData);
-      }
-    } catch (error) {
-      console.error("Błąd zapisu statystyk pokemona:", error);
+    if (existingPokemon) {
+      await updateCustomPokemon(existingPokemon.id, {
+        ...existingPokemon,
+        ...pokemonData,
+        id: existingPokemon.id,
+      });
+    } else {
+      await addCustomPokemon(pokemonData);
     }
   };
 
@@ -70,50 +69,70 @@ const Arena = () => {
     const score1 = pokemon1.base_experience * pokemon1.weight;
     const score2 = pokemon2.base_experience * pokemon2.weight;
 
-    if (score1 > score2) {
-      const updatedWinner = {
-        ...pokemon1,
-        base_experience: pokemon1.base_experience + 10,
-        win: (pokemon1.win || 0) + 1,
-        lose: pokemon1.lose || 0,
-      };
+    try {
+      if (score1 > score2) {
+        const updatedWinner = {
+          ...pokemon1,
+          base_experience: pokemon1.base_experience + 10,
+          win: (pokemon1.win || 0) + 1,
+          lose: pokemon1.lose || 0,
+        };
 
-      const updatedLoser = {
-        ...pokemon2,
-        win: pokemon2.win || 0,
-        lose: (pokemon2.lose || 0) + 1,
-      };
+        const updatedLoser = {
+          ...pokemon2,
+          win: pokemon2.win || 0,
+          lose: (pokemon2.lose || 0) + 1,
+        };
 
-      await savePokemonStats(updatedWinner);
-      await savePokemonStats(updatedLoser);
+        await savePokemonStats(updatedWinner);
+        await savePokemonStats(updatedLoser);
 
-      setWinner(updatedWinner);
-      setLoserId(pokemon2.id);
-      setIsDraw(false);
-    } else if (score2 > score1) {
-      const updatedWinner = {
-        ...pokemon2,
-        base_experience: pokemon2.base_experience + 10,
-        win: (pokemon2.win || 0) + 1,
-        lose: pokemon2.lose || 0,
-      };
+        setWinner(updatedWinner);
+        setLoserId(pokemon2.id);
+        setIsDraw(false);
 
-      const updatedLoser = {
-        ...pokemon1,
-        win: pokemon1.win || 0,
-        lose: (pokemon1.lose || 0) + 1,
-      };
+        enqueueSnackbar(`🏆 Wygrywa ${updatedWinner.name}!`, {
+          variant: "success",
+        });
+      } else if (score2 > score1) {
+        const updatedWinner = {
+          ...pokemon2,
+          base_experience: pokemon2.base_experience + 10,
+          win: (pokemon2.win || 0) + 1,
+          lose: pokemon2.lose || 0,
+        };
 
-      await savePokemonStats(updatedWinner);
-      await savePokemonStats(updatedLoser);
+        const updatedLoser = {
+          ...pokemon1,
+          win: pokemon1.win || 0,
+          lose: (pokemon1.lose || 0) + 1,
+        };
 
-      setWinner(updatedWinner);
-      setLoserId(pokemon1.id);
-      setIsDraw(false);
-    } else {
-      setWinner(null);
-      setLoserId(null);
-      setIsDraw(true);
+        await savePokemonStats(updatedWinner);
+        await savePokemonStats(updatedLoser);
+
+        setWinner(updatedWinner);
+        setLoserId(pokemon1.id);
+        setIsDraw(false);
+
+        enqueueSnackbar(`🏆 Wygrywa ${updatedWinner.name}!`, {
+          variant: "success",
+        });
+      } else {
+        setWinner(null);
+        setLoserId(null);
+        setIsDraw(true);
+
+        enqueueSnackbar("🤝 Remis! Żaden Pokémon nie otrzymuje punktów.", {
+          variant: "info",
+        });
+      }
+    } catch (error) {
+      console.error("Błąd podczas walki:", error);
+
+      enqueueSnackbar("Nie udało się zapisać wyniku walki", {
+        variant: "error",
+      });
     }
   };
 

@@ -1,33 +1,55 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { registerUser, getUserByEmail } from "../../../services/authService";
+
+const registerSchema = z
+  .object({
+    name: z
+      .string()
+      .min(3, "Imię musi mieć co najmniej 3 znaki"),
+    email: z
+      .string()
+      .min(1, "Email jest wymagany")
+      .email("Podaj poprawny adres email"),
+    password: z
+      .string()
+      .min(8, "Hasło musi mieć co najmniej 8 znaków")
+      .regex(/[A-Z]/, "Hasło musi zawierać co najmniej 1 dużą literę")
+      .regex(/[0-9]/, "Hasło musi zawierać co najmniej 1 cyfrę")
+      .regex(/[^A-Za-z0-9]/, "Hasło musi zawierać co najmniej 1 znak specjalny"),
+    repeatPassword: z
+      .string()
+      .min(1, "Powtórzenie hasła jest wymagane"),
+  })
+  .refine((data) => data.password === data.repeatPassword, {
+    message: "Hasła się nie zgadzają",
+    path: ["repeatPassword"],
+  });
 
 const Register = () => {
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
 
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    repeatPassword: "",
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      repeatPassword: "",
+    },
   });
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
+  const onSubmit = async (data) => {
     try {
-      const existingUser = await getUserByEmail(formData.email);
+      const existingUser = await getUserByEmail(data.email);
 
       if (existingUser) {
         enqueueSnackbar("Użytkownik o tym emailu już istnieje", {
@@ -36,17 +58,10 @@ const Register = () => {
         return;
       }
 
-      if (formData.password !== formData.repeatPassword) {
-        enqueueSnackbar("Hasła się nie zgadzają", {
-          variant: "error",
-        });
-        return;
-      }
-
       await registerUser({
-        name: formData.name,
-        email: formData.email,
-        password: formData.password,
+        name: data.name,
+        email: data.email,
+        password: data.password,
       });
 
       enqueueSnackbar("Rejestracja udana!", {
@@ -68,7 +83,7 @@ const Register = () => {
       <h1>Rejestracja</h1>
 
       <form
-        onSubmit={handleSubmit}
+        onSubmit={handleSubmit(onSubmit)}
         style={{
           display: "flex",
           flexDirection: "column",
@@ -77,41 +92,61 @@ const Register = () => {
           margin: "0 auto",
         }}
       >
-        <input
-          type="text"
-          name="name"
-          placeholder="Imię"
-          value={formData.name}
-          onChange={handleChange}
-          required
-        />
+        <div style={{ textAlign: "left" }}>
+          <input
+            type="text"
+            placeholder="Imię"
+            {...register("name")}
+            style={{ width: "100%", padding: "10px", boxSizing: "border-box" }}
+          />
+          {errors.name && (
+            <p style={{ color: "red", fontSize: "14px", marginTop: "4px" }}>
+              {errors.name.message}
+            </p>
+          )}
+        </div>
 
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={formData.email}
-          onChange={handleChange}
-          required
-        />
+        <div style={{ textAlign: "left" }}>
+          <input
+            type="email"
+            placeholder="Email"
+            {...register("email")}
+            style={{ width: "100%", padding: "10px", boxSizing: "border-box" }}
+          />
+          {errors.email && (
+            <p style={{ color: "red", fontSize: "14px", marginTop: "4px" }}>
+              {errors.email.message}
+            </p>
+          )}
+        </div>
 
-        <input
-          type="password"
-          name="password"
-          placeholder="Hasło"
-          value={formData.password}
-          onChange={handleChange}
-          required
-        />
+        <div style={{ textAlign: "left" }}>
+          <input
+            type="password"
+            placeholder="Hasło"
+            {...register("password")}
+            style={{ width: "100%", padding: "10px", boxSizing: "border-box" }}
+          />
+          {errors.password && (
+            <p style={{ color: "red", fontSize: "14px", marginTop: "4px" }}>
+              {errors.password.message}
+            </p>
+          )}
+        </div>
 
-        <input
-          type="password"
-          name="repeatPassword"
-          placeholder="Powtórz hasło"
-          value={formData.repeatPassword}
-          onChange={handleChange}
-          required
-        />
+        <div style={{ textAlign: "left" }}>
+          <input
+            type="password"
+            placeholder="Powtórz hasło"
+            {...register("repeatPassword")}
+            style={{ width: "100%", padding: "10px", boxSizing: "border-box" }}
+          />
+          {errors.repeatPassword && (
+            <p style={{ color: "red", fontSize: "14px", marginTop: "4px" }}>
+              {errors.repeatPassword.message}
+            </p>
+          )}
+        </div>
 
         <button type="submit">Zarejestruj się</button>
       </form>

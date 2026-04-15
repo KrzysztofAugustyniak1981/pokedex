@@ -2,7 +2,7 @@
   "users": [
     {
       "name": "Krzysztof",
-      "email": "1@1",
+      "email": "1@1.pl",
       "password": "123",
       "id": "pKYHVS1IA4c"
     },
@@ -11,6 +11,12 @@
       "email": "2@2",
       "password": "321",
       "id": "6k0-wU4fNl8"
+    },
+    {
+      "name": "Ala2",
+      "email": "a@a.pl",
+      "password": "Lala123+",
+      "id": "vEuh0XmPvPY"
     }
   ],
   "favorites": [

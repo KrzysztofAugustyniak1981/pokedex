@@ -1,32 +1,40 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth } from "../../../context/AuthContext";
+
+const loginSchema = z.object({
+  email: z
+    .string()
+    .min(1, "Email jest wymagany")
+    .email("Podaj poprawny adres email"),
+  password: z
+    .string()
+    .min(1, "Hasło jest wymagane"),
+});
 
 const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
   const { enqueueSnackbar } = useSnackbar();
 
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
   });
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
+  const onSubmit = async (data) => {
     try {
-      await login(formData.email, formData.password);
+      await login(data.email, data.password);
 
       enqueueSnackbar("Zalogowano pomyślnie!", {
         variant: "success",
@@ -45,7 +53,7 @@ const Login = () => {
       <h1>Logowanie</h1>
 
       <form
-        onSubmit={handleSubmit}
+        onSubmit={handleSubmit(onSubmit)}
         style={{
           display: "flex",
           flexDirection: "column",
@@ -54,23 +62,33 @@ const Login = () => {
           margin: "0 auto",
         }}
       >
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={formData.email}
-          onChange={handleChange}
-          required
-        />
+        <div style={{ textAlign: "left" }}>
+          <input
+            type="email"
+            placeholder="Email"
+            {...register("email")}
+            style={{ width: "100%", padding: "10px", boxSizing: "border-box" }}
+          />
+          {errors.email && (
+            <p style={{ color: "red", fontSize: "14px", marginTop: "4px" }}>
+              {errors.email.message}
+            </p>
+          )}
+        </div>
 
-        <input
-          type="password"
-          name="password"
-          placeholder="Hasło"
-          value={formData.password}
-          onChange={handleChange}
-          required
-        />
+        <div style={{ textAlign: "left" }}>
+          <input
+            type="password"
+            placeholder="Hasło"
+            {...register("password")}
+            style={{ width: "100%", padding: "10px", boxSizing: "border-box" }}
+          />
+          {errors.password && (
+            <p style={{ color: "red", fontSize: "14px", marginTop: "4px" }}>
+              {errors.password.message}
+            </p>
+          )}
+        </div>
 
         <button type="submit">Zaloguj się</button>
       </form>

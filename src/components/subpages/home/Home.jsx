@@ -17,7 +17,7 @@ const Home = () => {
       try {
         const customPokemons = await getCustomPokemons();
 
-        const merged = pokemons.map((pokemon) => {
+        const mergedApiPokemons = pokemons.map((pokemon) => {
           const edited = customPokemons.find(
             (custom) => custom.pokemonId === pokemon.id
           );
@@ -28,13 +28,27 @@ const Home = () => {
               weight: edited.weight,
               height: edited.height,
               base_experience: edited.base_experience,
+              win: edited.win ?? pokemon.win ?? 0,
+              lose: edited.lose ?? pokemon.lose ?? 0,
             };
           }
 
-          return pokemon;
+          return {
+            ...pokemon,
+            win: pokemon.win ?? 0,
+            lose: pokemon.lose ?? 0,
+          };
         });
 
-        setDisplayPokemons(merged);
+        const createdPokemons = customPokemons
+          .filter((custom) => !custom.pokemonId)
+          .map((custom) => ({
+            ...custom,
+            win: custom.win ?? 0,
+            lose: custom.lose ?? 0,
+          }));
+
+        setDisplayPokemons([...mergedApiPokemons, ...createdPokemons]);
       } catch (err) {
         console.error("Błąd ładowania customPokemons:", err);
         setDisplayPokemons(pokemons);
@@ -85,7 +99,7 @@ const Home = () => {
         }}
       >
         {paginatedPokemons.map((pokemon) => (
-          <PokemonCard key={pokemon.id} pokemon={pokemon} />
+          <PokemonCard key={pokemon.pokemonId || pokemon.id} pokemon={pokemon} />
         ))}
       </div>
 

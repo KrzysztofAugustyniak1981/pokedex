@@ -7,68 +7,105 @@ import {
   getFavorites,
 } from "../../../services/favoriteService";
 import { getArena, addToArena } from "../../../services/arenaService";
-import { getCustomPokemons } from "../../../services/customPokemonService";
+import {
+  getCustomPokemons,
+  getCustomPokemonById,
+} from "../../../services/customPokemonService";
 import { useAuth } from "../../../context/AuthContext";
 
 const PokemonDetails = () => {
   const { id } = useParams();
-  const { pokemon, loading } = usePokemon(id);
   const { user } = useAuth();
 
+  const isApiPokemon = !Number.isNaN(Number(id));
+  const { pokemon, loading } = usePokemon(isApiPokemon ? id : null);
+
   const [displayPokemon, setDisplayPokemon] = useState(null);
+  const [customLoading, setCustomLoading] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const [favoriteRecordId, setFavoriteRecordId] = useState(null);
   const [arenaCount, setArenaCount] = useState(0);
 
   useEffect(() => {
-    const loadMergedPokemon = async () => {
-      if (!pokemon) return;
+    const loadPokemonData = async () => {
+      if (isApiPokemon) {
+        if (!pokemon) return;
 
-      try {
-        const customPokemons = await getCustomPokemons();
-        const edited = customPokemons.find(
-          (custom) => custom.pokemonId === Number(id)
-        );
+        try {
+          const customPokemons = await getCustomPokemons();
+          const edited = customPokemons.find(
+            (custom) => custom.pokemonId === Number(id)
+          );
 
-        if (edited) {
+          if (edited) {
+            setDisplayPokemon({
+              ...pokemon,
+              weight: edited.weight,
+              height: edited.height,
+              base_experience: edited.base_experience,
+              image:
+                edited.image ||
+                pokemon.sprites?.other?.["official-artwork"]?.front_default ||
+                pokemon.sprites?.front_default,
+              win: edited.win ?? 0,
+              lose: edited.lose ?? 0,
+            });
+          } else {
+            setDisplayPokemon({
+              ...pokemon,
+              image:
+                pokemon.sprites?.other?.["official-artwork"]?.front_default ||
+                pokemon.sprites?.front_default,
+              win: pokemon.win ?? 0,
+              lose: pokemon.lose ?? 0,
+            });
+          }
+        } catch (error) {
+          console.error("Błąd ładowania customPokemons:", error);
           setDisplayPokemon({
             ...pokemon,
-            weight: edited.weight,
-            height: edited.height,
-            base_experience: edited.base_experience,
-            win: edited.win ?? 0,
-            lose: edited.lose ?? 0,
-          });
-        } else {
-          setDisplayPokemon({
-            ...pokemon,
+            image:
+              pokemon.sprites?.other?.["official-artwork"]?.front_default ||
+              pokemon.sprites?.front_default,
             win: pokemon.win ?? 0,
             lose: pokemon.lose ?? 0,
           });
         }
-      } catch (error) {
-        console.error("Błąd ładowania customPokemons:", error);
-        setDisplayPokemon({
-          ...pokemon,
-          win: pokemon.win ?? 0,
-          lose: pokemon.lose ?? 0,
-        });
+      } else {
+        setCustomLoading(true);
+
+        try {
+          const customPokemon = await getCustomPokemonById(id);
+
+          setDisplayPokemon({
+            ...customPokemon,
+            image: customPokemon.image,
+            types: customPokemon.types || [],
+            win: customPokemon.win ?? 0,
+            lose: customPokemon.lose ?? 0,
+          });
+        } catch (error) {
+          console.error("Błąd ładowania custom Pokémona:", error);
+          setDisplayPokemon(null);
+        } finally {
+          setCustomLoading(false);
+        }
       }
     };
 
-    loadMergedPokemon();
-  }, [pokemon, id]);
+    loadPokemonData();
+  }, [id, pokemon, isApiPokemon]);
 
   useEffect(() => {
     const checkFavorite = async () => {
-      if (!user) return;
+      if (!user || !displayPokemon) return;
 
       try {
         const favs = await getFavorites();
 
         const existingFavorite = favs.find(
           (fav) =>
-            fav.pokemonId === Number(id) &&
+            String(fav.pokemonId) === String(displayPokemon.pokemonId || displayPokemon.id) &&
             String(fav.userId) === String(user.id)
         );
 
@@ -84,13 +121,13 @@ const PokemonDetails = () => {
       }
     };
 
-    if (id && user) {
+    if (user && displayPokemon) {
       checkFavorite();
     } else {
       setIsFavorite(false);
       setFavoriteRecordId(null);
     }
-  }, [id, user]);
+  }, [user, displayPokemon]);
 
   useEffect(() => {
     const arena = getArena();
@@ -101,16 +138,16 @@ const PokemonDetails = () => {
     if (!displayPokemon || !user) return;
 
     try {
-      console.log("AKTUALNY USER:", user);
+      const pokemonIdentifier = displayPokemon.pokemonId || displayPokemon.id;
 
       if (isFavorite && favoriteRecordId) {
         await removeFavorite(favoriteRecordId);
         setIsFavorite(false);
         setFavoriteRecordId(null);
       } else {
-        const payload = {
+        const newFavorite = await addFavorite({
           userId: user.id,
-          pokemonId: Number(id),
+          pokemonId: pokemonIdentifier,
           name: displayPokemon.name,
           image:
             displayPokemon.sprites?.other?.["official-artwork"]?.front_default ||
@@ -118,11 +155,7 @@ const PokemonDetails = () => {
             displayPokemon.image,
           base_experience: displayPokemon.base_experience,
           weight: displayPokemon.weight,
-        };
-
-        console.log("PAYLOAD DO FAVORITES:", payload);
-
-        const newFavorite = await addFavorite(payload);
+        });
 
         setIsFavorite(true);
         setFavoriteRecordId(newFavorite.id);
@@ -135,8 +168,11 @@ const PokemonDetails = () => {
   const handleAddToArena = () => {
     if (!displayPokemon || !user) return;
 
+    const arenaId = displayPokemon.pokemonId || displayPokemon.id;
+
     const updated = addToArena({
-      id: displayPokemon.id,
+      id: arenaId,
+      sourceId: displayPokemon.id,
       name: displayPokemon.name,
       image:
         displayPokemon.sprites?.other?.["official-artwork"]?.front_default ||
@@ -152,7 +188,10 @@ const PokemonDetails = () => {
     setArenaCount(updated.length);
   };
 
-  if (loading) return <p>Ładowanie...</p>;
+  if ((isApiPokemon && loading) || (!isApiPokemon && customLoading)) {
+    return <p>Ładowanie...</p>;
+  }
+
   if (!displayPokemon) return <p>Brak danych</p>;
 
   return (
@@ -203,12 +242,18 @@ const PokemonDetails = () => {
       <p>Wygrane: {displayPokemon.win || 0}</p>
       <p>Przegrane: {displayPokemon.lose || 0}</p>
 
-      <h3>Typy:</h3>
-      <ul>
-        {displayPokemon.types?.map((type) => (
-          <li key={type.type.name}>{type.type.name}</li>
-        ))}
-      </ul>
+      {displayPokemon.types?.length > 0 && (
+        <>
+          <h3>Typy:</h3>
+          <ul>
+            {displayPokemon.types.map((type, index) => (
+              <li key={type?.type?.name || index}>
+                {type?.type?.name || type}
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
     </div>
   );
 };

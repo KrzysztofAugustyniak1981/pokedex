@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useContext } from "react";
+import clsx from "clsx";
 import { useAuth } from "../../context/AuthContext";
 import { ThemeContext } from "../../context/ThemeContext";
 
@@ -16,53 +17,40 @@ const Navbar = () => {
     navigate("/");
   };
 
+  const linkClass = clsx(
+    "rounded-lg px-3 py-2 text-sm font-medium transition hover:opacity-80",
+    "border border-transparent hover:border-gray-300 dark:hover:border-gray-600"
+  );
+
+  const buttonClass = clsx(
+    "rounded-lg px-3 py-2 text-sm font-medium transition",
+    "border border-gray-300 dark:border-gray-600",
+    "hover:bg-gray-100 dark:hover:bg-gray-800"
+  );
+
   return (
-    <nav
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        padding: "20px",
-        borderBottom: "1px solid #ddd",
-        flexWrap: "wrap",
-        gap: "16px",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "flex-start",
-          gap: "8px",
-        }}
-      >
+    <nav className="flex flex-col gap-4 border-b border-gray-300 px-5 py-5 md:flex-row md:items-center md:justify-between dark:border-gray-700">
+      <div className="flex flex-col gap-3">
         <Link
           to="/"
-          style={{
-            fontSize: "24px",
-            fontWeight: "bold",
-            textDecoration: "none",
-            color: "inherit",
-          }}
+          className="text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-100"
         >
           Pokedex
         </Link>
 
         {user && (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "10px",
-              flexWrap: "wrap",
-            }}
-          >
-            <span>Zalogowany: {user.name}</span>
+          <div className="flex flex-wrap items-center gap-3 text-sm text-gray-700 dark:text-gray-300">
+            <span className="rounded-md bg-gray-100 px-3 py-1 dark:bg-gray-800">
+              Zalogowany: {user.name}
+            </span>
 
             <button
               onClick={toggleTheme}
               disabled={!toggleTheme}
-              style={{ cursor: toggleTheme ? "pointer" : "not-allowed" }}
+              className={clsx(
+                buttonClass,
+                !toggleTheme && "cursor-not-allowed opacity-50"
+              )}
             >
               Motyw: {theme === "light" ? "🌞 Light" : "🌙 Dark"}
             </button>
@@ -70,19 +58,80 @@ const Navbar = () => {
         )}
       </div>
 
-      <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+      <div className="flex flex-wrap gap-2">
         {!user ? (
           <>
-            <Link to="/login">Login</Link>
-            <Link to="/register">Register</Link>
+            <Link
+              to="/login"
+              className={clsx(
+                linkClass,
+                "bg-blue-600 text-white hover:bg-blue-700"
+              )}
+            >
+              Login
+            </Link>
+
+            <Link
+              to="/register"
+              className={clsx(
+                linkClass,
+                "bg-green-600 text-white hover:bg-green-700"
+              )}
+            >
+              Register
+            </Link>
           </>
         ) : (
           <>
-            <Link to="/favorites">Ulubione</Link>
-            <Link to="/arena">Arena</Link>
-            <Link to="/ranking">Ranking</Link>
-            <Link to="/edit">Edytuj</Link>
-            <button onClick={handleLogout}>Wyloguj</button>
+            <Link
+              to="/favorites"
+              className={clsx(
+                linkClass,
+                "bg-pink-600 text-white hover:bg-pink-700"
+              )}
+            >
+              Ulubione
+            </Link>
+
+            <Link
+              to="/arena"
+              className={clsx(
+                linkClass,
+                "bg-orange-600 text-white hover:bg-orange-700"
+              )}
+            >
+              Arena
+            </Link>
+
+            <Link
+              to="/ranking"
+              className={clsx(
+                linkClass,
+                "bg-purple-600 text-white hover:bg-purple-700"
+              )}
+            >
+              Ranking
+            </Link>
+
+            <Link
+              to="/edit"
+              className={clsx(
+                linkClass,
+                "bg-teal-600 text-white hover:bg-teal-700"
+              )}
+            >
+              Edytuj
+            </Link>
+
+            <button
+              onClick={handleLogout}
+              className={clsx(
+                buttonClass,
+                "bg-red-600 text-white hover:bg-red-700"
+              )}
+            >
+              Wyloguj
+            </button>
           </>
         )}
       </div>

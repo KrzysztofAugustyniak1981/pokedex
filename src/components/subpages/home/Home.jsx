@@ -15,8 +15,9 @@ const Home = () => {
   useEffect(() => {
     const loadMergedPokemons = async () => {
       try {
+        //pobieramy custom pokemony z naszego "bazy danych"
         const customPokemons = await getCustomPokemons();
-
+        //łączymy dane z API i custom pokemony
         const mergedApiPokemons = pokemons.map((pokemon) => {
           const edited = customPokemons.find(
             (custom) => custom.pokemonId === pokemon.id
@@ -39,7 +40,7 @@ const Home = () => {
             lose: pokemon.lose ?? 0,
           };
         });
-
+        //dodajemy pokemony które zostały stworzone
         const createdPokemons = customPokemons
           .filter((custom) => !custom.pokemonId)
           .map((custom) => ({
@@ -59,7 +60,7 @@ const Home = () => {
       loadMergedPokemons();
     }
   }, [pokemons]);
-
+  //filtrowanie pokemonów
   const filteredPokemons = displayPokemons.filter((pokemon) =>
     pokemon.name.toLowerCase().includes(search.toLowerCase())
   );
@@ -71,7 +72,7 @@ const Home = () => {
   );
 
   const totalPages = Math.ceil(filteredPokemons.length / ITEMS_PER_PAGE);
-
+  //resetowanie strony po zmianie
   useEffect(() => {
     setCurrentPage(1);
   }, [search]);

@@ -5,6 +5,7 @@ import { useAuth } from "../../context/AuthContext";
 import { ThemeContext } from "../../context/ThemeContext";
 
 const Navbar = () => {
+  //czy zalogowany i ustawienie motywu
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const themeContext = useContext(ThemeContext);

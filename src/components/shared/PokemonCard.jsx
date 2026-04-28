@@ -3,6 +3,7 @@ import clsx from "clsx";
 import { useAuth } from "../../context/AuthContext";
 
 const PokemonCard = ({ pokemon }) => {
+  //pobranie danych i nawigacja
   const navigate = useNavigate();
   const { user } = useAuth();
 
@@ -12,7 +13,9 @@ const PokemonCard = ({ pokemon }) => {
     pokemon.image;
 
   const name = pokemon.name;
+  //ujednolicenie id
   const pokemonId = pokemon.pokemonId || pokemon.id;
+  //statystyki walki
   const wins = pokemon.win || 0;
   const loses = pokemon.lose || 0;
   const hasBattleStats = wins > 0 || loses > 0;

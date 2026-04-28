@@ -7,6 +7,7 @@ const usePokemons = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    //pobieranie pokemonów z API
     const fetchData = async () => {
       try {
         const data = await getPokemons();
@@ -19,6 +20,7 @@ const usePokemons = () => {
     };
 
     fetchData();
+    //pobieramy tylko raz []
   }, []);
 
   return { pokemons, loading, error };

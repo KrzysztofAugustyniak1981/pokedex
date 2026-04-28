@@ -13,6 +13,7 @@ import {
 const MIN_IMAGE_ID = 151;
 const MAX_IMAGE_ID = 300;
 
+//walidacja formularza(zod)
 const createPokemonSchema = z.object({
   name: z.string().min(2, "Nazwa musi mieć co najmniej 2 znaki"),
   weight: z
@@ -49,7 +50,7 @@ const CreatePokemon = () => {
       base_experience: "",
     },
   });
-
+  //pobieranie grafik
   useEffect(() => {
     const loadUsedImages = async () => {
       try {
@@ -72,13 +73,13 @@ const CreatePokemon = () => {
 
     loadUsedImages();
   }, []);
-
+  //wybieranie grafiki
   const selectedImageUrl = useMemo(() => {
     return getPokemonImageUrl(selectedImageId);
   }, [selectedImageId]);
-
+  //sprawdzanie czy grafika jest użyta
   const isCurrentImageUsed = usedImageIds.includes(selectedImageId);
-
+  //kolejna grafika
   const findNextAvailableImage = (startId, direction) => {
     let nextId = startId;
 
@@ -134,6 +135,7 @@ const CreatePokemon = () => {
 
   const onSubmit = async (data) => {
     try {
+      //blokowaniu duplikatów grafik
       if (isCurrentImageUsed) {
         enqueueSnackbar("Ta grafika jest już użyta. Wybierz inną.", {
           variant: "error",

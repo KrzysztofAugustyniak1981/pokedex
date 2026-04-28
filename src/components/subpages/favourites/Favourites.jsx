@@ -4,10 +4,12 @@ import PokemonCard from "../../shared/PokemonCard";
 import { useAuth } from "../../../context/AuthContext";
 
 const Favourites = () => {
+  //pobranie usera
   const { user } = useAuth();
   const [favorites, setFavorites] = useState([]);
 
   useEffect(() => {
+    //pobieranie ulubionych pokemonów dla danego usera
     const fetchFavorites = async () => {
       if (!user) {
         setFavorites([]);
@@ -29,6 +31,7 @@ const Favourites = () => {
     };
 
     fetchFavorites();
+    //odpalamy przy zmianie usera
   }, [user]);
 
   if (favorites.length === 0) {

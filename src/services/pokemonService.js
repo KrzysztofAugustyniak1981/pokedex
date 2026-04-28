@@ -3,11 +3,12 @@ import axios from "axios";
 const API_URL = "https://pokeapi.co/api/v2/pokemon";
 
 export const getPokemons = async () => {
+  //tylko 150, 
   const response = await axios.get(`${API_URL}?limit=150`);
 
   const results = response.data.results;
 
-  // pobranie szczegółów każdego pokemona
+  // pobranie szczegółów każdego pokemona bo wcześniej dostaliśmy ogólne dane
   const pokemonDetails = await Promise.all(
     results.map(async (pokemon) => {
       const res = await axios.get(pokemon.url);

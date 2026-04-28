@@ -1,50 +1,44 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useState } from "react";
 import { getUserByEmail } from "../services/authService";
 
+//globalny kontekst dla autoryzacji
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    const storedUser = localStorage.getItem("user");
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
 
-    // 🔁 odczyt usera z localStorage przy starcie
-    useEffect(() => {
-        const storedUser = localStorage.getItem("user");
+  const login = async (email, password) => {
+    const existingUser = await getUserByEmail(email);
 
-        if (storedUser) {
-            setUser(JSON.parse(storedUser));
-        }
-    }, []);
+    if (!existingUser) {
+      throw new Error("Użytkownik nie istnieje");
+    }
 
-    // 🔐 login
-    const login = async (email, password) => {
-        const existingUser = await getUserByEmail(email);
+    if (existingUser.password !== password) {
+      throw new Error("Nieprawidłowe hasło");
+    }
 
-        if (!existingUser) {
-            throw new Error("Użytkownik nie istnieje");
-        }
+    setUser(existingUser);
+    localStorage.setItem("user", JSON.stringify(existingUser));
+  };
 
-        if (existingUser.password !== password) {
-            throw new Error("Nieprawidłowe hasło");
-        }
+  const logout = () => {
+    setUser(null);
+    localStorage.removeItem("user");
+    localStorage.removeItem("arena");
+  };
 
-        setUser(existingUser);
-        localStorage.setItem("user", JSON.stringify(existingUser));
-    };
-
-    // 🚪 logout
-    const logout = () => {
-        setUser(null);
-        localStorage.removeItem("user");
-    };
-
-    return (
-        <AuthContext.Provider value={{ user, login, logout }}>
-            {children}
-        </AuthContext.Provider>
-    );
+  //udostępniamy usera i funkcje logowania/wylogowania globalnie
+  return (
+    <AuthContext.Provider value={{ user, login, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
-// custom hook (żeby łatwiej używać)
 export const useAuth = () => {
-    return useContext(AuthContext);
+  return useContext(AuthContext);
 };

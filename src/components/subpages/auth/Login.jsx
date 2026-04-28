@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth } from "../../../context/AuthContext";
 import clsx from "clsx";
 
+//walidacja formularza(zod)
 const loginSchema = z.object({
   email: z
     .string()
@@ -37,7 +38,7 @@ const Login = () => {
     "focus:border-blue-500 focus:ring-2 focus:ring-blue-200",
     "dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:placeholder:text-gray-500 dark:focus:border-blue-400 dark:focus:ring-blue-900"
   );
-
+  //logowanie
   const onSubmit = async (data) => {
     try {
       await login(data.email, data.password);

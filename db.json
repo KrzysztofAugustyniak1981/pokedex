@@ -21,41 +21,89 @@
   ],
   "favorites": [
     {
-      "userId": "pKYHVS1IA4c",
-      "pokemonId": 4,
-      "name": "charmander",
-      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/4.png",
-      "base_experience": 62,
-      "weight": 85,
-      "id": "EBBJeyjchyQ"
+      "userId": "vEuh0XmPvPY",
+      "pokemonId": 143,
+      "name": "snorlax",
+      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/143.png",
+      "base_experience": 189,
+      "weight": 4600,
+      "id": "kDVgZXrkmnA"
     },
     {
-      "userId": "6k0-wU4fNl8",
-      "pokemonId": 9,
-      "name": "blastoise",
-      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/9.png",
-      "base_experience": 239,
-      "weight": 855,
-      "id": "mBtwlnIYbjc"
+      "userId": "vEuh0XmPvPY",
+      "pokemonId": "FMoQD9rCv94",
+      "name": "black cttttt",
+      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/197.png",
+      "base_experience": 2137,
+      "weight": 23,
+      "id": "f4R7SnRpJHA"
     }
   ],
   "customPokemons": [
     {
-      "id": "MnsLDJEmnBQ",
-      "name": "123",
-      "weight": 123,
-      "height": 14,
-      "base_experience": 6
+      "name": "venusaur",
+      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/3.png",
+      "weight": 1000,
+      "height": 20,
+      "base_experience": 246,
+      "win": 1,
+      "lose": 0,
+      "pokemonId": 3,
+      "id": "qlFFa4sHTPg"
     },
     {
-      "name": "LOL",
-      "weight": 10,
-      "height": 9,
-      "base_experience": 8,
-      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/163.png",
+      "name": "charmeleon",
+      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/5.png",
+      "weight": 190,
+      "height": 11,
+      "base_experience": 152,
+      "win": 1,
+      "lose": 1,
+      "pokemonId": 5,
+      "id": "wM5zPEJsoO8"
+    },
+    {
+      "name": "bulbasaur",
+      "weight": 82,
+      "height": 19,
+      "base_experience": 1009,
+      "pokemonId": 1,
+      "id": "_aPCNlwRlhc",
+      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1.png",
+      "win": 1,
+      "lose": 0
+    },
+    {
+      "name": "beedrill",
+      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/15.png",
+      "weight": 295,
+      "height": 10,
+      "base_experience": 178,
       "win": 0,
+      "lose": 1,
+      "pokemonId": 15,
+      "id": "xzEnzDYBXRs"
+    },
+    {
+      "name": "black cttttt",
+      "weight": 23,
+      "height": 5,
+      "base_experience": 2137,
+      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/197.png",
+      "win": 0,
+      "lose": 1,
+      "id": "FMoQD9rCv94"
+    },
+    {
+      "name": "snorlax",
+      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/143.png",
+      "weight": 4600,
+      "height": 21,
+      "base_experience": 199,
+      "win": 1,
       "lose": 0,
-      "id": "9yrgeL8DmV8"
+      "pokemonId": 143,
+      "id": "0BDpjp18S3s"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

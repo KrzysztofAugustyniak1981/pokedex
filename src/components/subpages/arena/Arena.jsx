@@ -2,8 +2,12 @@ import { useEffect, useState } from "react";
 import { useSnackbar } from "notistack";
 import {
   getArena,
+  setArena,
   removeFromArena,
   clearArena,
+  getArenaBattleState,
+  setArenaBattleState,
+  clearArenaBattleState,
 } from "../../../services/arenaService";
 import {
   getCustomPokemons,
@@ -15,54 +19,92 @@ const Arena = () => {
   const { enqueueSnackbar } = useSnackbar();
 
   const [arenaPokemons, setArenaPokemons] = useState([]);
-  const [winner, setWinner] = useState(null);
+  const [winnerName, setWinnerName] = useState("");
   const [loserId, setLoserId] = useState(null);
   const [isDraw, setIsDraw] = useState(false);
+  const [battleFinished, setBattleFinished] = useState(false);
 
   useEffect(() => {
-    const data = getArena();
-    setArenaPokemons(data);
-  }, []);
+    //ładowanie pokemonów z areny i stanu walki
+    const arenaData = getArena();
+    setArenaPokemons(arenaData);
 
+    const savedBattleState = getArenaBattleState();
+    if (savedBattleState) {
+      setWinnerName(savedBattleState.winnerName || "");
+      setLoserId(savedBattleState.loserId || null);
+      setIsDraw(savedBattleState.isDraw || false);
+      setBattleFinished(savedBattleState.battleFinished || false);
+    }
+  }, []);
+  //resetowanie stanu walki
+  const resetBattleState = () => {
+    setWinnerName("");
+    setLoserId(null);
+    setIsDraw(false);
+    setBattleFinished(false);
+    clearArenaBattleState();
+  };
+  //usuwanie pokemona i wyniku z areny
   const handleRemove = (id) => {
     const updated = removeFromArena(id);
     setArenaPokemons(updated);
-    setWinner(null);
-    setLoserId(null);
-    setIsDraw(false);
+    resetBattleState();
   };
 
+  //zapisywanie statystyk
   const savePokemonStats = async (pokemon) => {
-    const customPokemons = await getCustomPokemons();
+  const customPokemons = await getCustomPokemons();
 
-    const existingPokemon = customPokemons.find(
-      (item) => item.pokemonId === pokemon.id
+  if (pokemon.isCustom) {
+    const existingCustomPokemon = customPokemons.find(
+      (item) => String(item.id) === String(pokemon.sourceId)
     );
 
-    const pokemonData = {
-      name: pokemon.name,
-      image: pokemon.image,
+    if (!existingCustomPokemon) return;
+
+    await updateCustomPokemon(existingCustomPokemon.id, {
+      ...existingCustomPokemon,
       weight: pokemon.weight,
       height: pokemon.height || 0,
       base_experience: pokemon.base_experience,
       win: pokemon.win || 0,
       lose: pokemon.lose || 0,
-      pokemonId: pokemon.id,
-    };
+      image: pokemon.image,
+      name: pokemon.name,
+    });
 
-    if (existingPokemon) {
-      await updateCustomPokemon(existingPokemon.id, {
-        ...existingPokemon,
-        ...pokemonData,
-        id: existingPokemon.id,
-      });
-    } else {
-      await addCustomPokemon(pokemonData);
-    }
+    return;
+  }
+
+  const existingPokemon = customPokemons.find(
+    (item) => Number(item.pokemonId) === Number(pokemon.pokemonId)
+  );
+
+  const pokemonData = {
+    name: pokemon.name,
+    image: pokemon.image,
+    weight: pokemon.weight,
+    height: pokemon.height || 0,
+    base_experience: pokemon.base_experience,
+    win: pokemon.win || 0,
+    lose: pokemon.lose || 0,
+    pokemonId: pokemon.pokemonId,
   };
 
+  if (existingPokemon) {
+    await updateCustomPokemon(existingPokemon.id, {
+      ...existingPokemon,
+      ...pokemonData,
+      id: existingPokemon.id,
+    });
+  } else {
+    await addCustomPokemon(pokemonData);
+  }
+};
+  //logika walki, aktualizacja statystyk, obsługa wyników
   const handleFight = async () => {
-    if (arenaPokemons.length < 2) return;
+    if (arenaPokemons.length < 2 || battleFinished) return;
 
     const [pokemon1, pokemon2] = arenaPokemons;
 
@@ -87,9 +129,22 @@ const Arena = () => {
         await savePokemonStats(updatedWinner);
         await savePokemonStats(updatedLoser);
 
-        setWinner(updatedWinner);
-        setLoserId(pokemon2.id);
+        const updatedArena = [updatedWinner, updatedLoser];
+
+        setArenaPokemons(updatedArena);
+        setArena(updatedArena);
+
+        setWinnerName(updatedWinner.name);
+        setLoserId(updatedLoser.id);
         setIsDraw(false);
+        setBattleFinished(true);
+
+        setArenaBattleState({
+          winnerName: updatedWinner.name,
+          loserId: updatedLoser.id,
+          isDraw: false,
+          battleFinished: true,
+        });
 
         enqueueSnackbar(`🏆 Wygrywa ${updatedWinner.name}!`, {
           variant: "success",
@@ -111,17 +166,40 @@ const Arena = () => {
         await savePokemonStats(updatedWinner);
         await savePokemonStats(updatedLoser);
 
-        setWinner(updatedWinner);
-        setLoserId(pokemon1.id);
+        const updatedArena = [pokemon1, pokemon2].map((pokemon) =>
+          pokemon.id === updatedWinner.id ? updatedWinner : updatedLoser
+        );
+
+        setArenaPokemons(updatedArena);
+        setArena(updatedArena);
+
+        setWinnerName(updatedWinner.name);
+        setLoserId(updatedLoser.id);
         setIsDraw(false);
+        setBattleFinished(true);
+
+        setArenaBattleState({
+          winnerName: updatedWinner.name,
+          loserId: updatedLoser.id,
+          isDraw: false,
+          battleFinished: true,
+        });
 
         enqueueSnackbar(`🏆 Wygrywa ${updatedWinner.name}!`, {
           variant: "success",
         });
       } else {
-        setWinner(null);
+        setWinnerName("");
         setLoserId(null);
         setIsDraw(true);
+        setBattleFinished(true);
+
+        setArenaBattleState({
+          winnerName: "",
+          loserId: null,
+          isDraw: true,
+          battleFinished: true,
+        });
 
         enqueueSnackbar("🤝 Remis! Żaden Pokémon nie otrzymuje punktów.", {
           variant: "info",
@@ -139,9 +217,7 @@ const Arena = () => {
   const handleLeaveArena = () => {
     clearArena();
     setArenaPokemons([]);
-    setWinner(null);
-    setLoserId(null);
-    setIsDraw(false);
+    resetBattleState();
   };
 
   return (
@@ -172,7 +248,7 @@ const Arena = () => {
                 textAlign: "center",
                 opacity: pokemon && loserId === pokemon.id ? 0.4 : 1,
                 background:
-                  pokemon && winner?.id === pokemon.id ? "#d4edda" : "#fff",
+                  pokemon && winnerName === pokemon.name ? "#d4edda" : "#fff",
               }}
             >
               {pokemon ? (
@@ -219,12 +295,15 @@ const Arena = () => {
       <div style={{ marginTop: "30px", textAlign: "center" }}>
         <button
           onClick={handleFight}
-          disabled={arenaPokemons.length < 2}
+          disabled={arenaPokemons.length < 2 || battleFinished}
           style={{
             padding: "12px 24px",
             fontSize: "18px",
-            cursor: arenaPokemons.length < 2 ? "not-allowed" : "pointer",
-            opacity: arenaPokemons.length < 2 ? 0.5 : 1,
+            cursor:
+              arenaPokemons.length < 2 || battleFinished
+                ? "not-allowed"
+                : "pointer",
+            opacity: arenaPokemons.length < 2 || battleFinished ? 0.5 : 1,
           }}
         >
           WALCZ!
@@ -232,11 +311,11 @@ const Arena = () => {
       </div>
 
       <div style={{ marginTop: "20px", textAlign: "center" }}>
-        {winner && <h2>🏆 Wygrywa: {winner.name}</h2>}
+        {!!winnerName && <h2>🏆 Wygrywa: {winnerName}</h2>}
         {isDraw && <h2>🤝 REMIS!</h2>}
       </div>
 
-      {(winner || isDraw) && (
+      {battleFinished && (
         <div style={{ marginTop: "20px", textAlign: "center" }}>
           <button onClick={handleLeaveArena}>Opuść arenę</button>
         </div>

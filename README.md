@@ -1,18 +1,44 @@
-# React + Vite
+Pokedex
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Aplikacja Pokedex stworzona w React w ramach projektu.
 
-Currently, two official plugins are available:
+Opis:
+Aplikacja pozwala na przeglądanie Pokemonów wyszukiwanie ich dodawanie do ulubionych i robienie walk wybranymi pokemonami.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Funkcjonalność:
+- Pobieramy pierwsze 150 Pokémonów  z API.
+- Filtrowanie pokemonów
+- Wyświetlanie karty pokemona ze szczegółami
+- Sekcja ulubione do której dodajemy pokemony
+- Walki pokemonów (arena)
+- Ranking, edycja i tworzenie Pokemonów
+- Tryb jasny/ciemny
+- Logowanie użytkownika i jego ustawień
 
-## React Compiler
+Technologie:
+- HTML, css, JS, React
+- ReactRouter
+- Context API
+- Axios
+- JSON Serwer
+- Reackt Hook
+- Zod
+- Notistack
+- Tailwind CSS i clsx
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+Uruchomienie:
+serwer:
+npx json-server --watch db.json --port 3001
+Aplikacja:
+npm run dev
+http://localhost:5173/
 
-Note: This will impact Vite dev & build performances.
+Struktura projektu:
+components – folder z komponentami zwracającymi jsx
+context – zarządzanie stanem za pomocą useContext
+hooks – custom hooki
+services – komunikacja z API
+routes – routing aplikacji
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Autor:
+Krzysztof Augustyniak

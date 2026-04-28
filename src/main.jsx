@@ -7,9 +7,12 @@ import { AuthProvider } from "./context/AuthContext.jsx";
 import "./index.css";
 
 ReactDom.createRoot(document.getElementById("root")).render(
+  //przechodzenie między stronami
   <BrowserRouter>
     <ThemeProvider>
+      //zalogowanie i rejestracja
       <AuthProvider>
+        //wyświetlanie powiadomień
         <SnackbarProvider maxSnack={3} autoHideDuration={3000}>
           <App />
         </SnackbarProvider>

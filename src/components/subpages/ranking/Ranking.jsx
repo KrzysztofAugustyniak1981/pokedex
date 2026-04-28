@@ -8,6 +8,7 @@ const Ranking = () => {
   const [sortBy, setSortBy] = useState("base_experience");
 
   useEffect(() => {
+    //ładowanie pokemona
     const loadMergedPokemons = async () => {
       try {
         const customPokemons = await getCustomPokemons();
@@ -32,6 +33,7 @@ const Ranking = () => {
         });
 
         const onlyCreatedPokemons = customPokemons.filter(
+          //filtrujemy pokemony które zostały stworzone
           (custom) => !custom.pokemonId
         );
 
@@ -48,6 +50,7 @@ const Ranking = () => {
   }, [pokemons]);
 
   const sortedPokemons = useMemo(() => {
+    //sortowanie pokemona według wybranego kryterium
     const copied = [...displayPokemons];
 
     return copied.sort((a, b) => {

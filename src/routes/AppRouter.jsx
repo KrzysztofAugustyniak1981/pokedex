@@ -14,11 +14,14 @@ import ProtectedRoute from "./ProtectedRoute";
 const AppRouter = () => {
     return (
         <Routes>
+            //publiczne strony (adresy)
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/pokemon/:id" element={<PokemonDetails />} />
 
+        
+            //chronione strony tylko dla zalogowanych
             <Route element={<ProtectedRoute />}>
                 <Route path="/favorites" element={<Favourites />} />
                 <Route path="/arena" element={<Arena />} />

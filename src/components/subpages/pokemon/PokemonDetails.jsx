@@ -14,18 +14,22 @@ import {
 import { useAuth } from "../../../context/AuthContext";
 
 const PokemonDetails = () => {
+  //pobranie id z url
   const { id } = useParams();
+  //sprawdzenie użytkownika
   const { user } = useAuth();
-
+  //sprawdzenie czy to pokemon z API czy customowy
   const isApiPokemon = !Number.isNaN(Number(id));
   const { pokemon, loading } = usePokemon(isApiPokemon ? id : null);
 
   const [displayPokemon, setDisplayPokemon] = useState(null);
   const [customLoading, setCustomLoading] = useState(false);
+  //czy jest w ulubione albo arena
   const [isFavorite, setIsFavorite] = useState(false);
   const [favoriteRecordId, setFavoriteRecordId] = useState(null);
   const [arenaCount, setArenaCount] = useState(0);
 
+  //ładowanie danych pokemona i nadpisywanie customowymi danymi
   useEffect(() => {
     const loadPokemonData = async () => {
       if (isApiPokemon) {
@@ -33,6 +37,7 @@ const PokemonDetails = () => {
 
         try {
           const customPokemons = await getCustomPokemons();
+          //czy custom
           const edited = customPokemons.find(
             (custom) => custom.pokemonId === Number(id)
           );
@@ -97,6 +102,7 @@ const PokemonDetails = () => {
   }, [id, pokemon, isApiPokemon]);
 
   useEffect(() => {
+    //sprawdzenie ulubionych
     const checkFavorite = async () => {
       if (!user || !displayPokemon) return;
 
@@ -129,11 +135,13 @@ const PokemonDetails = () => {
     }
   }, [user, displayPokemon]);
 
+  //sprawdzenie areny
   useEffect(() => {
     const arena = getArena();
     setArenaCount(arena.length);
   }, [id, user]);
 
+  //obsługa ulubionych
   const handleFavorite = async () => {
     if (!displayPokemon || !user) return;
 
@@ -165,14 +173,19 @@ const PokemonDetails = () => {
     }
   };
 
+  //obsługa areny
   const handleAddToArena = () => {
     if (!displayPokemon || !user) return;
 
-    const arenaId = displayPokemon.pokemonId || displayPokemon.id;
+    const isCustomPokemon = !Number.isNaN(Number(id)) ? false : true;
 
     const updated = addToArena({
-      id: arenaId,
+      id: isCustomPokemon
+        ? `custom-${displayPokemon.id}`
+        : `api-${displayPokemon.id}`,
+      pokemonId: displayPokemon.pokemonId || (isCustomPokemon ? null : displayPokemon.id),
       sourceId: displayPokemon.id,
+      isCustom: isCustomPokemon,
       name: displayPokemon.name,
       image:
         displayPokemon.sprites?.other?.["official-artwork"]?.front_default ||
@@ -181,8 +194,8 @@ const PokemonDetails = () => {
       base_experience: displayPokemon.base_experience,
       weight: displayPokemon.weight,
       height: displayPokemon.height,
-      win: displayPokemon.win,
-      lose: displayPokemon.lose,
+      win: displayPokemon.win || 0,
+      lose: displayPokemon.lose || 0,
     });
 
     setArenaCount(updated.length);

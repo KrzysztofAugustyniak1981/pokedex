@@ -11,7 +11,7 @@ import {
   addCustomPokemon,
   updateCustomPokemon,
 } from "../../../services/customPokemonService";
-
+//walidacja formularza
 const editPokemonSchema = z.object({
   weight: z
     .number({ invalid_type_error: "Podaj wagę" })
@@ -25,11 +25,13 @@ const editPokemonSchema = z.object({
 });
 
 const EditPokemonForm = () => {
+  //pobranie id pokemona
   const { id } = useParams();
   const navigate = useNavigate();
+  //komunikaty
   const { enqueueSnackbar } = useSnackbar();
   const { pokemons, loading } = usePokemons();
-
+  //stan pokemona i id rekordu w json-server (jeśli istnieje)
   const [pokemonName, setPokemonName] = useState("");
   const [recordId, setRecordId] = useState(null);
 
@@ -48,6 +50,7 @@ const EditPokemonForm = () => {
   });
 
   useEffect(() => {
+    //ładowanie danych
     const loadData = async () => {
       try {
         const customPokemons = await getCustomPokemons();
@@ -99,7 +102,7 @@ const EditPokemonForm = () => {
     "focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200",
     "dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:placeholder:text-gray-500 dark:focus:border-indigo-400 dark:focus:ring-indigo-900"
   );
-
+  //zapis zmian
   const onSubmit = async (data) => {
     try {
       const payload = {

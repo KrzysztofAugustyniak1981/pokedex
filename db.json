@@ -1,0 +1,110 @@
+{
+  "users": [
+    {
+      "name": "Krzysztof",
+      "email": "1@1.pl",
+      "password": "123",
+      "id": "pKYHVS1IA4c"
+    },
+    {
+      "name": "Ala",
+      "email": "2@2",
+      "password": "321",
+      "id": "6k0-wU4fNl8"
+    },
+    {
+      "name": "Ala2",
+      "email": "a@a.pl",
+      "password": "Lala123+",
+      "id": "vEuh0XmPvPY"
+    }
+  ],
+  "favorites": [
+    {
+      "userId": "vEuh0XmPvPY",
+      "pokemonId": 143,
+      "name": "snorlax",
+      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/143.png",
+      "base_experience": 189,
+      "weight": 4600,
+      "id": "kDVgZXrkmnA"
+    },
+    {
+      "userId": "vEuh0XmPvPY",
+      "pokemonId": "FMoQD9rCv94",
+      "name": "black cttttt",
+      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/197.png",
+      "base_experience": 2137,
+      "weight": 23,
+      "id": "f4R7SnRpJHA"
+    }
+  ],
+  "customPokemons": [
+    {
+      "name": "venusaur",
+      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/3.png",
+      "weight": 1000,
+      "height": 20,
+      "base_experience": 246,
+      "win": 1,
+      "lose": 0,
+      "pokemonId": 3,
+      "id": "qlFFa4sHTPg"
+    },
+    {
+      "name": "charmeleon",
+      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/5.png",
+      "weight": 190,
+      "height": 11,
+      "base_experience": 152,
+      "win": 1,
+      "lose": 1,
+      "pokemonId": 5,
+      "id": "wM5zPEJsoO8"
+    },
+    {
+      "name": "bulbasaur",
+      "weight": 82,
+      "height": 19,
+      "base_experience": 1009,
+      "pokemonId": 1,
+      "id": "_aPCNlwRlhc",
+      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1.png",
+      "win": 1,
+      "lose": 0
+    },
+    {
+      "name": "beedrill",
+      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/15.png",
+      "weight": 295,
+      "height": 10,
+      "base_experience": 178,
+      "win": 0,
+      "lose": 1,
+      "pokemonId": 15,
+      "id": "xzEnzDYBXRs"
+    },
+    {
+      "name": "black cttttt",
+      "weight": 23,
+      "height": 5,
+      "base_experience": 2137,
+      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/197.png",
+      "win": 0,
+      "lose": 1,
+      "id": "FMoQD9rCv94"
+    },
+    {
+      "name": "snorlax",
+      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/143.png",
+      "weight": 4600,
+      "height": 21,
+      "base_experience": 199,
+      "win": 1,
+      "lose": 0,
+      "pokemonId": 143,
+      "id": "0BDpjp18S3s"
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
+}
